@@ -1,0 +1,19 @@
+{
+    "name": "bricks81/bricks-classloader",
+    "description": "Extendable Class Factories",
+    "license": "GPLv3",
+    "authors": [
+        {
+            "name": "Sven Ullmann",
+            "email": "kontakt@28-n-half.de"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+    	"php": ">=5.3.3",    
+    	"bricks81/bricks-config": "0.1.*@stable"	
+    },
+    "autoload": {
+    	"classmap": ["Module.php"]
+    }
+}
