@@ -11,9 +11,15 @@
     "minimum-stability": "stable",
     "require": {
     	"php": ">=5.3.3",    
-    	"bricks81/bricks-config": "0.1.*@stable"	
+    	"bricks81/BricksConfig": "dev-master"	
     },
     "autoload": {
     	"classmap": ["Module.php"]
-    }
+    },
+    "repositories": [
+    	{
+    		"type":"VCS",
+    		"url":"https://github.com/bricks81/BricksConfig.git"
+    	}
+    ]
 }
