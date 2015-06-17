@@ -1,6 +1,6 @@
 {
     "name": "bricks81/bricks-classloader",
-    "description": "Extendable Class Factories",
+    "description": "Bricks CMS Framework Class Managment Factories",
     "license": "GPLv3",
     "authors": [
         {
@@ -8,18 +8,12 @@
             "email": "kontakt@28-n-half.de"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "require": {
     	"php": ">=5.3.3",    
-    	"bricks81/BricksConfig": "dev-master"	
+    	"bricks81/bricks-config": "dev-master"	
     },
     "autoload": {
     	"classmap": ["Module.php"]
-    },
-    "repositories": [
-    	{
-    		"type":"vcs",
-    		"url":"https://github.com/bricks81/BricksConfig.git"
-    	}
-    ]
+    }
 }
