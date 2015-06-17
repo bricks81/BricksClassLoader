@@ -18,7 +18,7 @@
     },
     "repositories": [
     	{
-    		"type":"VCS",
+    		"type":"vcs",
     		"url":"https://github.com/bricks81/BricksConfig.git"
     	}
     ]
