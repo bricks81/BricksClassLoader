@@ -6,7 +6,7 @@
  * @link https://github.com/bricks81/BricksClassLoader
  * @license http://www.gnu.org/licenses/ (GPLv3)
  */
-namespace Bricks\Classloader\ServiceManager;
+namespace Bricks\ClassLoader\ServiceManager;
 
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;

@@ -6,7 +6,7 @@
  * @link https://github.com/bricks81/BricksClassLoader
  * @license http://www.gnu.org/licenses/ (GPLv3)
  */
-namespace BricksClassloader;
+namespace BricksClassLoader;
 
 class Module {
 	
