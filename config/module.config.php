@@ -3,7 +3,7 @@
 return array(
 	'service_manager' => array(
 		'factories' => array(
-			'BricksClassLoader' => 'Bricks\Classloader\ServiceManager\ClassLoaderFactory',
+			'BricksClassLoader' => 'Bricks\ClassLoader\ServiceManager\ClassLoaderFactory',
 		),
 	),
 	'BricksClassLoader' => array(
