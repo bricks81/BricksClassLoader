@@ -1,6 +1,6 @@
 <?php
 
-namespace BricksConfigTest;
+namespace BricksClassLoaderTest;
 
 use Zend\Mvc\Service\ServiceManagerConfig;
 use Zend\ServiceManager\ServiceManager;

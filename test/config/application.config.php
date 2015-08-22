@@ -7,7 +7,8 @@
  */
 return array(
     // This should be an array of module namespaces used in the application.
-    'modules' => array(    	        
+    'modules' => array(   
+    	'BricksConfig' 	        
     ),
 
     // These are various options for the listeners attached to the ModuleManager
@@ -24,6 +25,7 @@ return array(
         // modules are loaded. These effectively override configuration
         // provided by modules themselves. Paths may use GLOB_BRACE notation.
         'config_glob_paths' => array(
+        	'config/module.config.php',
             'config/autoload/{{,*.}global,{,*.}local}.php',
         ),
 
