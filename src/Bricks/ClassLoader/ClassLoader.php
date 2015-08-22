@@ -105,10 +105,15 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	}
 	
 	/**
+	 * @param string $module
 	 * @return ConfigInterface
 	 */
-	public function getConfig(){
-		return $this->config;
+	public function getConfig($module=null){
+		if(null==$module){
+			return $this->config;
+		} else {
+			return $this->config->getConfig($module);
+		}
 	}
 	
 	/**
@@ -153,12 +158,17 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 */
 	public function solveAlias($alias,$module,$namespace=null){
 		$namespace = null==$namespace?$module:$namespace;
-		$aliases = array_replace_recursive(
-			$this->getConfig()->getArray($module),
-			$this->getConfig()->getArray($namespace)
+		$_cfg = $this->getConfig('BricksClassLoader')->getArray($namespace);
+		$aliases = array(
+			'defaultClassLoaderClass' => $_cfg['defaultClassLoaderClass'],
+			'defaultInstantiator' => $_cfg['defaultInstantiator'],
+			'defaultFactory' => $_cfg['defaultFactory'], 
+		);
+		$aliases = array_merge_recursive(
+			$aliases,			
+			$this->getConfig($module)->getArray($namespace)['aliases']
 		);
 		$parts = explode('.',$alias);
-		
 		if(1 == count($parts) && !isset($aliases[$alias])){
 			return $alias;
 		}				
@@ -195,7 +205,7 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 			} else {
 				$class = $pointer[$aliasName];
 			}
-		}
+		}		
 		return $class;
 		
 	}
@@ -251,13 +261,10 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 */
 	public function getInstantiators($alias,$module,$namespace=null){		
 		$namespace = null === $namespace ? $module : $namespace;
-		$aliases = array_replace_recursive(
-			$this->getConfig()->getArray($module),
-			$this->getConfig()->getArray($namespace)
-		);
 		if(!isset($this->instantiators[$module][$namespace])){
 			$this->instantiators[$module][$namespace] = array();
-			if(false !== strpos($alias,'.') && !isset($aliases[$alias])){				
+			$aliases = $this->getConfig($module)->getArray($namespace)['aliases'];			
+			if(false !== strpos($alias,'.') && !isset($aliases[$alias])){	
 				return array();
 			}
 			
@@ -269,19 +276,20 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 				$parts[] = $aliasName;
 			}
 			foreach($parts AS $key){
-				if(isset($pointer[$aliasName]['instantiators'])
-						&& is_array($pointer[$aliasName]['instantiators'])
+				if(
+					isset($pointer[$aliasName]['instantiators'])
+					&& is_array($pointer[$aliasName]['instantiators'])
 				){
 					$this->processInstantiatorConfig($pointer[$aliasName]['instantiators'],$this->instantiators[$module][$namespace]);
 				}
-				if(isset($pointer[$key])){
-					$pointer = &$pointer[$key];
+				if(isset($pointer[$key])){					
+					$pointer = &$pointer[$key];					
 				}
 			}
-			if(isset($pointer[$aliasName]['instantiators']) && is_array($pointer[$aliasName]['instantiators'])){
-				$this->processInstantiatorConfig($pointer[$aliasName]['instantiators'],$this->instantiators[$module][$namespace]);
-			}			
-		}
+			if(isset($pointer['instantiators']) && is_array($pointer['instantiators'])){
+				$this->processInstantiatorConfig($pointer['instantiators'],$this->instantiators[$module][$namespace]);
+			}	
+		}		
 		return $this->instantiators[$module][$namespace];
 	}
 	
@@ -378,8 +386,8 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 * @param array $config
 	 * @param array &$ref
 	 */
-	protected function processInstantiatorConfig($config,&$ref){		
-		foreach($config AS $data){			
+	protected function processInstantiatorConfig($config,&$ref){
+		foreach($config AS $data){					
 			if(!is_array($data)){
 				$data = array(
 					'class' => false,
@@ -397,7 +405,7 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 			}
 			if($exists){
 				continue;
-			}
+			}			
 			$ref[] = $this->instantiateInstantiator($data['instantiator'],$data['class'],$data['method']);
 		}
 	}
@@ -409,7 +417,8 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	public function addDefaultInstantiatorIfNeeded(array &$instantiators,$namespace=null){
 		$namespace = null === $namespace ? 'BricksClassLoader' : $namespace;
 		if(0 == count($instantiators)){
-			$instantiator = $this->instantiateInstantiator($this->getConfig()->get('defaultInstantiator',$namespace));
+			$class = $this->getConfig('BricksClassLoader')->get('defaultInstantiator',$namespace);
+			$instantiator = $this->instantiateInstantiator($class);
 		}
 		array_push($instantiators,$instantiator);
 	}

@@ -12,7 +12,7 @@ class ClassLoaderTest extends PHPUnit_Framework_TestCase {
 		$config = null==$config?Bootstrap::getServiceManager()->get('BricksConfig')->getConfig('BricksClassLoader'):$config;
 		$classLoaderClass = $config->get('classLoaderClass');
 		$classLoader = new $classLoaderClass($config);
-		return $classLoader;		
+		return $classLoader;
 	}
 	
 	public function testGetInstance(){
@@ -26,7 +26,7 @@ class ClassLoaderTest extends PHPUnit_Framework_TestCase {
 		$classLoader = $this->getInstance();
 		$cl = $classLoader->getClassLoader('BricksTest');
 		
-		$object = $classLoader->newInstance(__CLASS__,__FUNCTION__,'anyClass','BricksTest');
+		$object = $classLoader->newInstance(__CLASS__,__FUNCTION__,'anyClass','BricksClassLoader','BricksClassLoaderTest');
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObject',$object);
 		
 		$object = $classLoader->newInstance(__CLASS__,__FUNCTION__,'anyClass','BricksTest','BricksTestExtended');
