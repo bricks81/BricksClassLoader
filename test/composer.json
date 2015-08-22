@@ -1,6 +1,6 @@
 {
-    "name": "bricks81/bricks-class-loader",
-    "description": "Bricks CMS Framework Class Managment Factories",
+    "name": "phpunit",
+    "description": "PHPUnit",
     "license": "MIT",
     "authors": [
         {
@@ -10,8 +10,8 @@
     ],
     "minimum-stability": "dev",
     "require": {
-    	"php": ">=5.3.3",    
-    	"bricks81/bricks-config": "dev-master",
+    	"php": ">=5.3.3",
+    	"bricks81/bricks-config":"dev-master",
     	"zendframework/zend-config": "2.5.*@stable",
     	"zendframework/zend-servicemanager": "2.5.*@stable",
     	"zendframework/zend-modulemanager": "2.5.*@stable",
@@ -20,9 +20,9 @@
     	"zendframework/zend-view": "2.5.*@stable",
     	"zendframework/zend-serializer": "2.5.*@stable",
     	"zendframework/zend-log": "2.5.*@stable",
-    	"zendframework/zend-i18n": "2.5.*@stable" 	
+    	"zendframework/zend-i18n": "2.5.*@stable"     	    	
     },
     "autoload": {
-    	"classmap": ["Module.php"]
-    }
+    	"classmap": ["autoload_classmap.php"]
+    }    
 }

@@ -8,19 +8,22 @@ use Zend\Config\Config;
 
 class ClassLoaderTest extends PHPUnit_Framework_TestCase {
 	
+	public function getInstance($config=null){
+		$config = null==$config?Bootstrap::getServiceManager()->get('BricksConfig')->getConfig('BricksClassLoader'):$config;
+		$classLoaderClass = $config->get('classLoaderClass');
+		$classLoader = new $classLoaderClass($config);
+		return $classLoader;		
+	}
+	
 	public function testGetInstance(){
-		$cfg = new Config(Bootstrap::getServiceManager()->get('Config')['BricksClassLoader'],true);
-		$config = Bootstrap::getServiceManager()->get('BricksConfig')->getConfig('BricksClassLoader');
-		$classLoader = new ClassLoader($config,$cfg);
+		$classLoader = $this->getInstance();
 		$this->assertInstanceOf('Bricks\ClassLoader\ClassLoader',$classLoader);
 		$cl = $classLoader->getClassLoader('BricksClassLoader');
 		$this->assertInstanceOf('Bricks\ClassLoader\ClassLoaderInterface',$cl);
-	}	
+	}
 
 	public function testLoadingClasses(){
-		$cfg = new Config(Bootstrap::getServiceManager()->get('Config')['BricksClassLoader'],true);
-		$config = Bootstrap::getServiceManager()->get('BricksConfig')->getConfig('BricksClassLoader');
-		$classLoader = new ClassLoader($config,$cfg);
+		$classLoader = $this->getInstance();
 		$cl = $classLoader->getClassLoader('BricksTest');
 		
 		$object = $classLoader->newInstance(__CLASS__,__FUNCTION__,'anyClass','BricksTest');
@@ -40,7 +43,6 @@ class ClassLoaderTest extends PHPUnit_Framework_TestCase {
 		
 		$object = $cl->getSingleton(__CLASS__,__FUNCTION__,'anyClass');
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObjectExtended',$object);
-		
 	}
 	
 }

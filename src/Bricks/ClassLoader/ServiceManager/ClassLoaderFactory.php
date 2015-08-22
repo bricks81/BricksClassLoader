@@ -38,10 +38,9 @@ class ClassLoaderFactory implements FactoryInterface {
 	 * @see \Zend\ServiceManager\FactoryInterface::createService()
 	 */
 	public function createService(ServiceLocatorInterface $sl){
-		$classLoaderConfig = $sl->get('Config')['BricksClassLoader'];		
 		$config = $sl->get('BricksConfig')->getConfig('BricksClassLoader');		
 		$class = $config->get('classLoaderClass');		
-		$service = new $class($config,new Config($classLoaderConfig));
+		$service = new $class($config);
 		$service->setServiceLocator($sl);
 		return $service;
 	}

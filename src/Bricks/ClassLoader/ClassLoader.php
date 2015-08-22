@@ -45,11 +45,6 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	protected $config;
 	
 	/**
-	 * @var \Zend\Config\Config
-	 */
-	protected $classLoaderConfig;
-	
-	/**
 	 * @var array
 	 */
 	protected $instantiators = array();
@@ -82,9 +77,8 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	/**
 	 * @param ConfigInterface $config
 	 */
-	public function __construct(ConfigInterface $config,ZendConfig $classLoaderConfig){
-		$this->setConfig($config);
-		$this->setClassLoaderConfig($classLoaderConfig);				
+	public function __construct(ConfigInterface $config){
+		$this->setConfig($config);						
 	}
 	
 	/**
@@ -115,20 +109,6 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 */
 	public function getConfig(){
 		return $this->config;
-	}
-	
-	/**
-	 * @param \Zend\Config\Config $config
-	 */
-	public function setClassLoaderConfig(ZendConfig $config){
-		$this->classLoaderConfig = $config;
-	}
-	
-	/**
-	 * @return \Zend\Config\Config
-	 */
-	public function getClassLoaderConfig(){
-		return $this->classLoaderConfig;
 	}
 	
 	/**
@@ -173,14 +153,10 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 */
 	public function solveAlias($alias,$module,$namespace=null){
 		$namespace = null==$namespace?$module:$namespace;
-		if(!isset($this->getClassLoaderConfig()->$module->$module)){			
-			return $alias;
-		}		
-		$aliases = $this->getClassLoaderConfig()->$module->$module->toArray();
-		if(isset($this->getClassLoaderConfig()->$module->$namespace)){
-			$aliases = array_replace_recursive($aliases,$this->getClassLoaderConfig()->$module->$namespace->toArray());
-		}
-
+		$aliases = array_replace_recursive(
+			$this->getConfig()->getArray($module),
+			$this->getConfig()->getArray($namespace)
+		);
 		$parts = explode('.',$alias);
 		
 		if(1 == count($parts) && !isset($aliases[$alias])){
@@ -274,17 +250,13 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 * @return array
 	 */
 	public function getInstantiators($alias,$module,$namespace=null){		
-		$namespace = null === $namespace ? $module : $namespace;		
+		$namespace = null === $namespace ? $module : $namespace;
+		$aliases = array_replace_recursive(
+			$this->getConfig()->getArray($module),
+			$this->getConfig()->getArray($namespace)
+		);
 		if(!isset($this->instantiators[$module][$namespace])){
 			$this->instantiators[$module][$namespace] = array();
-			if(!isset($this->getClassLoaderConfig()->$module)){
-				return array();
-			}			
-			$this->instantiators[$module][$namespace] = array();
-			$aliases = $this->getClassLoaderConfig()->$module->toArray();
-			if(isset($this->getClassLoaderConfig()->$module->$namespace)){
-				$aliases = array_replace_recursive($aliases,$this->getClassLoaderConfig()->$module->$namespace->toArray());
-			}			
 			if(false !== strpos($alias,'.') && !isset($aliases[$alias])){				
 				return array();
 			}
@@ -514,17 +486,11 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 		$namespace = null==$namespace?$module:$namespace;
 		if(!isset($this->factories[$module][$namespace])){
 			$this->factories[$module][$namespace] = array();
-			if(!isset($this->getClassLoaderConfig()->$module)){
-				return array();
-			}
-			$this->factories[$module][$namespace] = array();
-			$aliases = $this->getClassLoaderConfig()->$module->toArray();
-			if(isset($this->getClassLoaderConfig()->$module->$namespace)){
-				$aliases = array_replace_recursive($aliases,$this->getClassLoaderConfig()->$module->$namespace->toArray());
-			}
-			
-			$parts = explode('.',$alias);
-			
+			$aliases = array_replace_recursive(
+				$this->getConfig()->getArray($module),
+				$this->getConfig()->getArray($namespace)
+			);			
+			$parts = explode('.',$alias);			
 			if(1 == count($parts) && !isset($aliases[$alias])){
 				return array();
 			}
