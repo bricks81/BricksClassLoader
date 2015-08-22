@@ -12,15 +12,15 @@ return array(
 				),
 				'aliases' => array(										
 					'anyClass' => 'BricksClassLoaderTest\TestObject',						
-					'anyClass' => 'BricksClassLoaderTest\TestObjectExtended',						
+					'BricksClassLoaderTest\TestObject' => 'BricksClassLoaderTest\TestObject2',
 				),
 			),
 			'BricksClassLoaderTest' => array(
-				'aliases' => array(					
-					'BricksClassLoaderTest\TestObject' => 'BricksClassLoaderTest\TestObject2',
-					'BricksClassLoaderTest\TestObjectExtended' => 'BricksClassLoaderTest\TestObjectExtended2',					
+				'aliases' => array(
+					'BricksClassLoaderTest\TestObjectExtended' => 'BricksClassLoaderTest\TestObjectExtended2',
+					'anyClass' => 'BricksClassLoaderTest\TestObjectExtended',
 				),
 			),
-		),
+		),		
 	),
 );

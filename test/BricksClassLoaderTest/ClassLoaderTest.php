@@ -24,21 +24,21 @@ class ClassLoaderTest extends PHPUnit_Framework_TestCase {
 
 	public function testLoadingClasses(){
 		$classLoader = $this->getInstance();
-		$cl = $classLoader->getClassLoader('BricksTest');
+		$cl = $classLoader->getClassLoader('BricksClassLoader');
 		
-		$object = $classLoader->newInstance(__CLASS__,__FUNCTION__,'anyClass','BricksClassLoader','BricksClassLoaderTest');
+		$object = $classLoader->newInstance(__CLASS__,__FUNCTION__,'anyClass','BricksClassLoader');
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObject',$object);
 		
-		$object = $classLoader->newInstance(__CLASS__,__FUNCTION__,'anyClass','BricksTest','BricksTestExtended');
+		$object = $classLoader->newInstance(__CLASS__,__FUNCTION__,'anyClass','BricksClassLoader','BricksClassLoaderTest');
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObjectExtended',$object);
 		
 		$object = $cl->newInstance(__CLASS__,__FUNCTION__,'anyClass');
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObject',$object);
 		
-		$object = $cl->newInstance(__CLASS__,__FUNCTION__,'anyClass','BricksTestExtended');
+		$object = $cl->newInstance(__CLASS__,__FUNCTION__,'anyClass','BricksClassLoaderTest');
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObjectExtended',$object);
 		
-		$object = $cl->getSingleton(__CLASS__,__FUNCTION__,'anyClass','BricksTestExtended');
+		$object = $cl->getSingleton(__CLASS__,__FUNCTION__,'anyClass','BricksClassLoaderTest');
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObjectExtended',$object);
 		
 		$object = $cl->getSingleton(__CLASS__,__FUNCTION__,'anyClass');

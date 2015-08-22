@@ -262,7 +262,7 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	public function getInstantiators($alias,$module,$namespace=null){		
 		$namespace = null === $namespace ? $module : $namespace;
 		if(!isset($this->instantiators[$module][$namespace])){
-			$this->instantiators[$module][$namespace] = array();
+			$this->instantiators[$module][$namespace] = array();			
 			$aliases = $this->getConfig($module)->getArray($namespace)['aliases'];			
 			if(false !== strpos($alias,'.') && !isset($aliases[$alias])){	
 				return array();
