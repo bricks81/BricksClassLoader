@@ -105,38 +105,37 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	}
 	
 	/**
-	 * @param string $module
 	 * @return ConfigInterface
 	 */
-	public function getConfig($module=null){
-		if(null==$module){
-			return $this->config;
-		} else {
-			return $this->config->getConfig($module);
-		}
+	public function getConfig(){
+		return $this->config;		
+	}
+	
+	/**
+	 * @param ClassLoaderInterface $classLoader
+	 * @param string $module
+	 * @param string $namespace
+	 */
+	public function setClassLoader(ClassLoaderInterface $classLoader,$module,$namespace=null){
+		$namespace = $namespace?:$module;
+		$this->classLoaders[$module][$namespace] = $classLoader;
 	}
 	
 	/**
 	 * @param string $module
-	 * @param ClassLoaderInterface $classLoader
+	 * @param string $namespace
+	 * @return \Bricks\ClassLoader\ClassLoader | \Bricks\ClassLoader\ClassLoaderInterface
 	 */
-	public function setClassLoader($module,ClassLoaderInterface $classLoader){
-		$this->classLoaders[$module] = $classLoader;
-	}
-	
-	/**
-	 * (non-PHPdoc)
-	 * @see \Bricks\ClassLoader\ClassLoaderInterface::getClassLoader()
-	 */
-	public function getClassLoader($module=null){
+	public function getClassLoader($module=null,$namespace=null){
 		if(null===$module){
 			return $this;
 		}
-		if(!$this->hasClassLoader($module)){					
+		$namespace = $namespace?:$module;
+		if(!$this->hasClassLoader($module,$namespace)){					
 			$alias = 'defaultClassLoaderClass';			
-			$this->classLoaders[$module] = $this->newInstance(__CLASS__,__FUNCTION__,$alias,'BricksClassLoader',$module,array(
+			$this->classLoaders[$module][$namespace] = $this->newInstance(__CLASS__,__FUNCTION__,$alias,'BricksClassLoader','BricksClassLoader',array(
 				'ClassLoader' => $this,
-				'moduleName' => $module,				
+				'moduleName' => $module		
 			));
 		}
 		return $this->classLoaders[$module];
@@ -144,10 +143,12 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	
 	/**
 	 * @param string $module
+	 * @param string $namespace
 	 * @return boolean
 	 */
-	public function hasClassLoader($module){
-		return isset($this->classLoaders[$module]);
+	public function hasClassLoader($module,$namespace=null){
+		$namespace = $namespace?:$module;
+		return isset($this->classLoaders[$module][$namespace]);
 	}
 
 	/**
@@ -155,7 +156,7 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 * @param array $aliases
 	 * @return string
 	 */
-	protected function parseAlias($alias,$aliases){		
+	public function parseAlias($alias,$aliases){		
 		$parts = explode('.',$alias);
 		if(1 == count($parts)){
 			while(isset($aliases[$alias])){
@@ -210,27 +211,23 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	}
 	
 	/**
-	 * @param string $alias
 	 * @param string $module
 	 * @param string $namespace
-	 * @return string
+	 * @return array
 	 */
-	public function solveAlias($alias,$module,$namespace=null){
-		$namespace = null==$namespace?$module:$namespace;
-		$_cfg = $this->getConfig()->getArray($namespace);
-		$aliases = array(
-			'defaultClassLoaderClass' => $_cfg['defaultClassLoaderClass'],
-			'defaultInstantiator' => $_cfg['defaultInstantiator'],
-			'defaultFactory' => $_cfg['defaultFactory'], 
-		);		
-		$aliases = array_merge_recursive(
-			$aliases,			
-			$this->getConfig()->getArray($namespace)['aliases']
-		);		
-
-		$classOrAlias = $this->parseAlias($alias,$aliases);
-			
-		return $classOrAlias;		
+	public function getAliases($module,$namespace=null){
+		$namespace = $namespace?:$module;
+		$ret1 = $this->getConfig()->get('classMap.'.$module.'.'.$module);
+		$ret2 = $this->getConfig()->get('classMap.'.$module.'.'.$namespace);
+		if(is_array($ret1) && is_array($ret2)){
+			$aliases = array_replace_recursive($ret1,$ret2);
+		} elseif(is_array($ret1)){
+			$aliases = $ret1;
+		} elseif(is_array($ret2)){
+			$aliases = $ret2;
+		} else {
+			$aliases = array();
+		}
 	}
 	
 	/**
@@ -283,16 +280,14 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 * @return array
 	 */
 	public function getInstantiators($alias,$module,$namespace=null){		
-		$namespace = null === $namespace ? $module : $namespace;
+		$namespace = $namespace?:$module;
 		if(!isset($this->instantiators[$module][$namespace])){
 			$this->instantiators[$module][$namespace] = array();
-			$aliases = $this->getConfig()->getArray($namespace)['aliases'];			
+			$aliases = $this->getAliases($module,$namespace);
 			if(false !== strpos($alias,'.') && !isset($aliases[$alias])){	
 				return array();
 			}
-			
-			$classOrAlias = $this->parseAlias($alias,$aliases);
-			
+			$classOrAlias = $this->parseAlias($alias,$aliases);			
 			if(
 				isset($aliases[$classOrAlias]['instantiators'])
 				&& is_array($aliases[$classOrAlias]['instantiators'])
@@ -502,38 +497,24 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 * @return array
 	 */
 	public function getFactories($alias,$module,$namespace=null){
-		$namespace = null==$namespace?$module:$namespace;
+		$namespace = $namespace?:$module;
 		if(!isset($this->factories[$module][$namespace])){
 			$this->factories[$module][$namespace] = array();
-			$aliases = array_replace_recursive(
-				$this->getConfig()->getArray($module),
-				$this->getConfig()->getArray($namespace)
-			);			
+			$aliases = $this->getAliases($module,$namespace);
+						
 			$parts = explode('.',$alias);			
 			if(1 == count($parts) && !isset($aliases[$alias])){
 				return array();
 			}
 			
-			$parts = explode('.',$alias);
-			$aliasName = array_pop($parts);
-			$pointer = &$aliases;
-			$class = $alias;
-			if(0==count($parts)){
-				$parts[] = $aliasName;
+			$classOrAlias = $this->parseAlias($alias,$aliases);
+			
+			if(
+				isset($aliases[$classOrAlias]['factories'])
+				&& is_array($aliases[$classOrAlias]['factories'])
+			){
+				$this->processFactoryConfig($aliases[$classOrAlias]['factories'],$this->factories[$module][$namespace]);
 			}
-			foreach($parts AS $key){
-				if(isset($pointer[$aliasName]['factories'])
-						&& is_array($pointer[$aliasName]['factories'])
-				){
-					$this->processFactoryConfig($pointer[$aliasName]['factories'],$this->factories[$module][$namespace]);
-				}
-				if(isset($pointer[$key])){
-					$pointer = &$pointer[$key];
-				}
-			}
-			if(isset($pointer[$aliasName]['factories']) && is_array($pointer[$aliasName]['factories'])){
-				$this->processFactoryConfig($pointer[$aliasName]['factories'],$this->factories[$module][$namespace]);
-			}	
 			$this->sortFactories($this->factories[$module][$namespace]);			
 		}
 		return $this->factories[$module][$namespace];
@@ -672,7 +653,8 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 			$this->instanceNamespaces[$module][$alias] = $namespace;
 		}		
 		
-		$className = $this->solveAlias($alias, $module, $namespace);
+		$aliases = $this->getAliases($module,$namespace);
+		$className = $this->parseAlias($alias,$aliases);		
 		
 		if(!$this->hasInstance($className,$module,$namespace)){			
 			$object = $this->newInstance($class,$method,$alias,$module,$namespace,$factoryParams);
