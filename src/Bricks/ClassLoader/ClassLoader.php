@@ -155,9 +155,14 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 * @param array $aliases
 	 * @return string
 	 */
-	protected function parseAlias($alias,$aliases){
+	protected function parseAlias($alias,$aliases){		
 		$parts = explode('.',$alias);
-		if(1 == count($parts) && !isset($aliases[$alias])){
+		if(1 == count($parts)){
+			while(isset($aliases[$alias])){
+				$key = $alias;
+				$alias = $aliases[$alias];
+				unset($aliases[$key]);
+			}
 			return $alias;
 		}
 		
@@ -195,11 +200,11 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 			}
 		}
 		
-		while(isset($aliases[$classOrAlias])){
+		while(isset($aliases[$classOrAlias])){			
 			$key = $classOrAlias;
 			$classOrAlias = $aliases[$classOrAlias];
 			unset($aliases[$key]);
-		}		
+		}
 		
 		return $classOrAlias;
 	}
@@ -212,19 +217,19 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 */
 	public function solveAlias($alias,$module,$namespace=null){
 		$namespace = null==$namespace?$module:$namespace;
-		$_cfg = $this->getConfig('BricksClassLoader')->getArray($namespace);
+		$_cfg = $this->getConfig()->getArray($namespace);
 		$aliases = array(
 			'defaultClassLoaderClass' => $_cfg['defaultClassLoaderClass'],
 			'defaultInstantiator' => $_cfg['defaultInstantiator'],
 			'defaultFactory' => $_cfg['defaultFactory'], 
-		);
+		);		
 		$aliases = array_merge_recursive(
 			$aliases,			
-			$this->getConfig($module)->getArray($namespace)['aliases']
-		);
+			$this->getConfig()->getArray($namespace)['aliases']
+		);		
 
 		$classOrAlias = $this->parseAlias($alias,$aliases);
-	
+			
 		return $classOrAlias;		
 	}
 	
@@ -280,8 +285,8 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	public function getInstantiators($alias,$module,$namespace=null){		
 		$namespace = null === $namespace ? $module : $namespace;
 		if(!isset($this->instantiators[$module][$namespace])){
-			$this->instantiators[$module][$namespace] = array();			
-			$aliases = $this->getConfig($module)->getArray($namespace)['aliases'];			
+			$this->instantiators[$module][$namespace] = array();
+			$aliases = $this->getConfig()->getArray($namespace)['aliases'];			
 			if(false !== strpos($alias,'.') && !isset($aliases[$alias])){	
 				return array();
 			}
@@ -422,7 +427,7 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	public function addDefaultInstantiatorIfNeeded(array &$instantiators,$namespace=null){
 		$namespace = null === $namespace ? 'BricksClassLoader' : $namespace;
 		if(0 == count($instantiators)){
-			$class = $this->getConfig('BricksClassLoader')->get('defaultInstantiator',$namespace);
+			$class = $this->getConfig()->get('defaultInstantiator',$namespace);
 			$instantiator = $this->instantiateInstantiator($class);
 		}
 		array_push($instantiators,$instantiator);

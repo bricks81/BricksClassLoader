@@ -30,7 +30,8 @@ class Bootstrap {
 		static::$serviceManager = $serviceManager;
 		\Zend\Loader\AutoloaderFactory::factory(array(
 			'Zend\Loader\ClassMapAutoloader' => array(
-        		'BricksClassLoader' => '../autoload_classmap.php',				
+        		'BricksClassLoader' => '../autoload_classmap.php',
+				'BricksClassLoaderTest' => './autoload_classmap.php'				
     		),			
 		));
 	}
