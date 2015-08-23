@@ -152,6 +152,60 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 
 	/**
 	 * @param string $alias
+	 * @param array $aliases
+	 * @return string
+	 */
+	protected function parseAlias($alias,$aliases){
+		$parts = explode('.',$alias);
+		if(1 == count($parts) && !isset($aliases[$alias])){
+			return $alias;
+		}
+		
+		$aliasName = array_pop($parts);
+		$pointer = &$aliases;
+		$classOrAlias = $alias;
+		if(0==count($parts)){
+			if(!isset($pointer[$aliasName])){
+				return $classOrAlias;
+			}
+			return $pointer[$aliasName];
+		}
+		
+		foreach($parts AS $key){
+			if(isset($pointer[$aliasName])) {
+				if(is_array($pointer[$aliasName])){
+					if(isset($pointer[$aliasName]['class'])){
+						$classOrAlias = $pointer[$aliasName]['class'];
+					}
+				} else {
+					$classOrAlias = $pointer[$aliasName];
+				}
+			}
+			if(isset($pointer[$key])){
+				$pointer = &$pointer[$key];
+			}
+		}
+		if(isset($pointer[$aliasName])){
+			if(is_array($pointer[$aliasName])){
+				if(isset($pointer[$aliasName]['class'])){
+					$classOrAlias = $pointer[$aliasName]['class'];
+				}
+			} else {
+				$classOrAlias = $pointer[$aliasName];
+			}
+		}
+		
+		while(isset($aliases[$classOrAlias])){
+			$key = $classOrAlias;
+			$classOrAlias = $aliases[$classOrAlias];
+			unset($aliases[$key]);
+		}		
+		
+		return $classOrAlias;
+	}
+	
+	/**
+	 * @param string $alias
 	 * @param string $module
 	 * @param string $namespace
 	 * @return string
@@ -168,46 +222,10 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 			$aliases,			
 			$this->getConfig($module)->getArray($namespace)['aliases']
 		);
-		$parts = explode('.',$alias);
-		if(1 == count($parts) && !isset($aliases[$alias])){
-			return $alias;
-		}				
-		
-		$aliasName = array_pop($parts);
-		$pointer = &$aliases;
-		$class = $alias;		
-		if(0==count($parts)){
-			if(!isset($pointer[$aliasName])){
-				return $alias;
-			}
-			return $pointer[$aliasName];
-		}
-		
-		foreach($parts AS $key){
-			if(isset($pointer[$aliasName])) {
-				if(is_array($pointer[$aliasName])){					
-					if(isset($pointer[$aliasName]['class'])){
-						$class = $pointer[$aliasName]['class'];
-					}
-				} else {					
-					$class = $pointer[$aliasName];
-				}
-			}
-			if(isset($pointer[$key])){
-				$pointer = &$pointer[$key];
-			}
-		}
-		if(isset($pointer[$aliasName])){
-			if(is_array($pointer[$aliasName])){
-				if(isset($pointer[$aliasName]['class'])){
-					$class = $pointer[$aliasName]['class'];
-				}
-			} else {
-				$class = $pointer[$aliasName];
-			}
-		}		
-		return $class;
-		
+
+		$classOrAlias = $this->parseAlias($alias,$aliases);
+	
+		return $classOrAlias;		
 	}
 	
 	/**
@@ -268,27 +286,14 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 				return array();
 			}
 			
-			$parts = explode('.',$alias);
-			$aliasName = array_pop($parts);
-			$pointer = &$aliases;
-			$class = $alias;
-			if(0==count($parts)){
-				$parts[] = $aliasName;
-			}
-			foreach($parts AS $key){
-				if(
-					isset($pointer[$aliasName]['instantiators'])
-					&& is_array($pointer[$aliasName]['instantiators'])
-				){
-					$this->processInstantiatorConfig($pointer[$aliasName]['instantiators'],$this->instantiators[$module][$namespace]);
-				}
-				if(isset($pointer[$key])){					
-					$pointer = &$pointer[$key];					
-				}
-			}
-			if(isset($pointer['instantiators']) && is_array($pointer['instantiators'])){
-				$this->processInstantiatorConfig($pointer['instantiators'],$this->instantiators[$module][$namespace]);
-			}	
+			$classOrAlias = $this->parseAlias($alias,$aliases);
+			
+			if(
+				isset($aliases[$classOrAlias]['instantiators'])
+				&& is_array($aliases[$classOrAlias]['instantiators'])
+			){
+				$this->processInstantiatorConfig($aliases[$classOrAlias],$this->instantiators[$module][$namespace]);
+			}				
 		}		
 		return $this->instantiators[$module][$namespace];
 	}

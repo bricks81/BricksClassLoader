@@ -29,14 +29,23 @@ class ClassLoaderTest extends PHPUnit_Framework_TestCase {
 		$object = $classLoader->newInstance(__CLASS__,__FUNCTION__,'anyClass','BricksClassLoader');
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObject',$object);
 		
-		$object = $classLoader->newInstance(__CLASS__,__FUNCTION__,'anyClass','BricksClassLoader','BricksClassLoaderTest');
+		$object = $classLoader->newInstance(__CLASS__,__FUNCTION__,'anyClassExtended','BricksClassLoader');
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObjectExtended',$object);
+		
+		$object = $classLoader->newInstance(__CLASS__,__FUNCTION__,'anyClass','BricksClassLoader','BricksClassLoaderTest');
+		$this->assertInstanceOf('BricksClassLoaderTest\TestObject2',$object);
+		
+		$object = $classLoader->newInstance(__CLASS__,__FUNCTION__,'anyClassExtended','BricksClassLoaderTest');
+		$this->assertInstanceOf('BricksClassLoaderTest\TestObjectExtended2',$object);
 		
 		$object = $cl->newInstance(__CLASS__,__FUNCTION__,'anyClass');
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObject',$object);
 		
 		$object = $cl->newInstance(__CLASS__,__FUNCTION__,'anyClass','BricksClassLoaderTest');
-		$this->assertInstanceOf('BricksClassLoaderTest\TestObjectExtended',$object);
+		$this->assertInstanceOf('BricksClassLoaderTest\TestObject2',$object);
+		
+		$object = $cl->newInstance(__CLASS__,__FUNCTION__,'deeper.class.hirarchy','BricksClassLoaderTest');
+		$this->assertInstanceOf('BricksClassLoaderTest\TestObject2',$object);
 		
 		$object = $cl->getSingleton(__CLASS__,__FUNCTION__,'anyClass','BricksClassLoaderTest');
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObjectExtended',$object);

@@ -11,14 +11,19 @@ return array(
 				'defaultFactories' => array(
 				),
 				'aliases' => array(										
-					'anyClass' => 'BricksClassLoaderTest\TestObject',						
-					'BricksClassLoaderTest\TestObject' => 'BricksClassLoaderTest\TestObject2',
+					'anyClass' => 'BricksClassLoaderTest\TestObject',
+					'anyClassExtended' => 'BricksClassLoaderTest\TestObjectExtended',
+					'deeper' => array(
+						'class' => array(
+							'hierarchy' => 'BricksClassLoaderTest\TestObject', 
+						),
+					),
 				),
 			),
 			'BricksClassLoaderTest' => array(
 				'aliases' => array(
 					'BricksClassLoaderTest\TestObjectExtended' => 'BricksClassLoaderTest\TestObjectExtended2',
-					'anyClass' => 'BricksClassLoaderTest\TestObjectExtended',
+					'BricksClassLoaderTest\TestObject' => 'BricksClassLoaderTest\TestObject2',					
 				),
 			),
 		),		

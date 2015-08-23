@@ -20,7 +20,8 @@
     	"zendframework/zend-view": "2.5.*@stable",
     	"zendframework/zend-serializer": "2.5.*@stable",
     	"zendframework/zend-log": "2.5.*@stable",
-    	"zendframework/zend-i18n": "2.5.*@stable"     	    	
+    	"zendframework/zend-i18n": "2.5.*@stable",
+        "zendframework/zftool": "dev-master"     	    	
     },
     "autoload": {
     	"classmap": ["autoload_classmap.php"]
