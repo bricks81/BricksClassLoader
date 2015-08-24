@@ -3,7 +3,7 @@
 return array(
 	'BricksConfig' => array(		
 		'BricksClassLoader' => array( // Module to configure
-			'BricksClassLoader' => array( // Namespace
+			'BricksClassLoader' => array( // Config namespace
 				'defaultFactories' => array(),
 				'classMap' => array(
 					'BricksClassLoader' => array( // Module to load from
@@ -11,8 +11,7 @@ return array(
 							'classLoaderClass' => 'Bricks\ClassLoader\ClassLoader',
 							'defaultClassLoaderClass' => 'Bricks\ClassLoader\DefaultClassLoader',
 							'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
-							'defaultFactory' => 'Bricks\ClassLoader\DefaultFactory',
-							
+							'defaultFactory' => 'Bricks\ClassLoader\DefaultFactory',														
 						),
 					),
 					'BricksClassLoaderTest' => array(
