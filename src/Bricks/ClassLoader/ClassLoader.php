@@ -156,12 +156,12 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 * @param string $module
 	 * @param string $namespace
 	 * @return array
-	 * @throws \RuntimeException
+	 * @throws CouldNotLoadException
 	 */
 	public function getAliases($module,$namespace=null){
 		$array = $this->getConfig()->getArray('BricksClassLoader');
 		if(!isset($array['classMap'])){
-			throw new \RuntimeException('There is no class map defined');
+			throw new CouldNotLoadException('There is no class map defined');
 		}
 		$config = $array['classMap'];
 		$aliases = array();
@@ -170,7 +170,7 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 		}
 		if(isset($config[$module][$namespace])){
 			$aliases = array_replace_recursive($aliases,$config[$module][$namespace]);
-		}		
+		}
 		return $aliases;
 	}
 	
@@ -238,8 +238,12 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 * @param string $class
 	 * @param string $method
 	 * @return object
+	 * @trows CouldNotLoadException
 	 */
 	public function instantiateInstantiator($instantiator,$class=false,$method=false){
+		if(!class_exists($instantiator,true)){
+			throw new CouldNotLoadException('Instantiator class '.$instantiator.' could not be loaded');
+		}
 		$instantiator = new $instantiator();		
 		$instantiator->setOnClass($class);
 		$instantiator->setOnMethod($method);
@@ -299,15 +303,19 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 			){
 				$this->processInstantiatorConfig($aliases[$classOrAlias],$this->instantiators[$module][$namespace]);
 			}				
-		}		
+		}
 		return $this->instantiators[$module][$namespace];
 	}
 	
 	/**
 	 * @param string $factory
 	 * @return \Bricks\ClassLoader\FactoryInterface
+	 * @throws CouldNotLoadException
 	 */
 	public function instantiateFactory($factory,$class=false,$method=false){
+		if(!class_exists($factory,true)){
+			throw new CouldNotLoadException('Factory class '.$instantiator.' could not be loaded');
+		}
 		$factory = new $factory();
 		$factory->setClassLoader($this);
 		$factory->setOnClass($class);
@@ -580,6 +588,7 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 * @param array $factoryParams
 	 * @throws CouldNotInstantiateException
 	 * @return object
+	 * @throws CouldNotLoadException
 	 */
 	public function instantiate($alias,$module,$namespace=null,array $factoryParams=array()){
 		$object = null;
@@ -587,17 +596,21 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 		$instantiators = $this->getInstantiators($alias,$module,$namespace);
 		$this->addDefaultInstantiatorIfNeeded($instantiators,$namespace);
 		$aliases = $this->getAliases($module,$namespace);
-		$class = $this->parseAlias($alias,$aliases);		
+		$class = $this->parseAlias($alias,$aliases);
+		
+		if(!class_exists($class,true)){
+			throw new CouldNotLoadException('Class/Alias '.$class.' could not be loaded');
+		}
 		
 		foreach($instantiators AS $instantiator){						
 			$object = $instantiator->instantiate($class,$factoryParams);
 			if(is_object($object)){
 				break;
-			}			
+			}
 		}
 		if(null === $object){
-			throw new CouldNotInstantiateException('class "'.$class.'" could not be instantiated because of missing instantiator');
-		}		
+			throw new CouldNotInstantiateException('Class/Alias "'.$class.'" could not be instantiated');
+		}
 		return $object;
 	}
 
@@ -659,9 +672,13 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 		}		
 		
 		$aliases = $this->getAliases($module,$namespace);
-		$className = $this->parseAlias($alias,$aliases);		
+		$class = $this->parseAlias($alias,$aliases);		
 		
-		if(!$this->hasInstance($className,$module,$namespace)){			
+		if(!class_exists($class,true)){
+			throw new \RuntimeException('Class/Alias '.$class.' could not be loaded');
+		}
+		
+		if(!$this->hasInstance($class,$module,$namespace)){			
 			$object = $this->newInstance($class,$method,$alias,$module,$namespace,$factoryParams);
 			$this->setInstance($class,$object,$module,$namespace);			
 		} else {
@@ -683,8 +700,8 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 * @return object
 	 */
 	public function newInstance($class,$method,$alias,$module,$namespace=null,array $factoryParams=array()){
-		$namespace = $namespace?:$module;				
-		$object = $this->instantiate($alias, $module, $namespace, $factoryParams);
+		$namespace = $namespace?:$module;		
+		$object = $this->instantiate($alias, $module, $namespace, $factoryParams);				
 		$this->factory($class,$method,$object,$alias,$module,$namespace,$factoryParams);
 		return $object;
 	}

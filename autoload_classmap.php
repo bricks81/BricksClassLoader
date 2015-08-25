@@ -6,6 +6,7 @@ return array(
     'Bricks\ClassLoader\ClassLoaderAwareInterface'         => __DIR__ . '/src/Bricks/ClassLoader/ClassLoaderAwareInterface.php',
     'Bricks\ClassLoader\ClassLoaderInterface'              => __DIR__ . '/src/Bricks/ClassLoader/ClassLoaderInterface.php',
     'Bricks\ClassLoader\CouldNotInstantiateException'      => __DIR__ . '/src/Bricks/ClassLoader/CouldNotInstantiateException.php',
+	'Bricks\ClassLoader\CouldNotLoadException'      	   => __DIR__ . '/src/Bricks/ClassLoader/CouldNotLoadException.php',
     'Bricks\ClassLoader\DefaultClassLoader'                => __DIR__ . '/src/Bricks/ClassLoader/DefaultClassLoader.php',
     'Bricks\ClassLoader\DefaultFactory'                    => __DIR__ . '/src/Bricks/ClassLoader/DefaultFactory.php',
     'Bricks\ClassLoader\DefaultInstantiator'               => __DIR__ . '/src/Bricks/ClassLoader/DefaultInstantiator.php',
