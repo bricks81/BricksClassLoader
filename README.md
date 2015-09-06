@@ -42,13 +42,20 @@ Add the configuration for your module:
 
 ```php
 	// ...
-	'BricksClassLoader' => array(
-		'YourModule' => array(
-			'YourModule' => array( // as your namespace
-				'classAlias' => 'YourModule\Class'
-				'setOfClasses' => array(
-					'class1' => 'YourModule\ClassOne',
-					'class2' => 'YourModule\ClassTwo',
+	'BricksConfig' => array(
+		// ...
+		'BricksClassLoader' => array(
+			'BricksClassLoader' => array(
+				'classMap' => array(
+					'YourModule' =>
+						'YourNamespace' => array(
+							'classAlias' => 'YourModule\Class'
+							'setOfClasses' => array(
+								'class1' => 'YourModule\ClassOne',
+								'class2' => 'YourModule\ClassTwo',
+							),
+						),
+					),
 				),
 			),			
 		),
