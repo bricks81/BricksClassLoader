@@ -100,6 +100,13 @@ class DefaultClassLoader implements ClassLoaderInterface {
 	}
 	
 	/**
+	 * @return \Zend\ServiceManager\ServiceLocatorInterface
+	 */
+	public function getServiceLocator(){
+		return $this->classLoader->getServiceLocator();
+	}
+	
+	/**
 	 * (non-PHPdoc)
 	 * @see \Bricks\ClassLoader\ClassLoaderInterface::solveAlias()
 	 */
