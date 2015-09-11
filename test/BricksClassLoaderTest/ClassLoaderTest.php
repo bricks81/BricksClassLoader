@@ -35,4 +35,8 @@ class ClassLoaderTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Bricks\ClassLoader\DefaultFactory',$object);		
 	}
 	
+	public function testAlias(){
+		$classLoader = $this->getInstance();
+	}
+	
 }

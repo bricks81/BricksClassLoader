@@ -97,6 +97,75 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	}
 	
 	/**
+	 * @param string $alias
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function getAliasClass($alias,$namespace){
+		$namespace = $namespace?:'BricksClassLoader';
+		$aliasMap = $this->getConfig()->get('aliasMap',$namespace);
+		$parts = explode('.',$alias);
+		if(1 == count($parts)){
+			while(isset($aliases[$alias])){
+				$key = $alias;
+				$alias = $aliases[$alias];
+				unset($aliases[$key]);
+			}
+			return $alias;
+		}
+	
+		$aliasName = array_pop($parts);
+		$pointer = &$aliases;
+		$classOrAlias = $alias;
+		if(0==count($parts)){
+			if(!isset($pointer[$aliasName])){
+				return $classOrAlias;
+			}
+			return $pointer[$aliasName];
+		}
+	
+		foreach($parts AS $key){
+			if(isset($pointer[$aliasName])) {
+				if(is_array($pointer[$aliasName])){
+					if(isset($pointer[$aliasName]['class'])){
+						$classOrAlias = $pointer[$aliasName]['class'];
+					}
+				} else {
+					$classOrAlias = $pointer[$aliasName];
+				}
+			}
+			if(isset($pointer[$key])){
+				$pointer = &$pointer[$key];
+			}
+		}
+		if(isset($pointer[$aliasName])){
+			if(is_array($pointer[$aliasName])){
+				if(isset($pointer[$aliasName]['class'])){
+					$classOrAlias = $pointer[$aliasName]['class'];
+				}
+			} else {
+				$classOrAlias = $pointer[$aliasName];
+			}
+		}
+	
+		while(isset($aliases[$classOrAlias])){
+			$key = $classOrAlias;
+			$classOrAlias = $aliases[$classOrAlias];
+			unset($aliases[$key]);
+		}
+	
+		return $classOrAlias;
+	}
+	
+	/**
+	 * @param string $alias
+	 * @param string $namespace
+	 */
+	public function aliasToClass($alias,$namespace=null){
+		
+	}
+	
+	/**
 	 * @param InstantiatorInterface $instantiator
 	 * @param string class
 	 * @param string namespace 

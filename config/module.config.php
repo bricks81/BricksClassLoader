@@ -19,6 +19,14 @@ return array(
 					'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
 					'defaultFactory' => 'Bricks\ClassLoader\DefaultFactory',						
 					
+				),
+				'aliasMap' => array(
+					'user' => array(
+						'userClass' => 'Default\User\Class',
+						'deeper' => array(
+							'useClass' => 'Other\User\Class', 
+						),
+					),
 				),			
 			),
 			'BricksMapper' => array(
