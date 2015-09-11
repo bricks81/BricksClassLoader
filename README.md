@@ -45,17 +45,9 @@ Add the configuration for your module:
 	'BricksConfig' => array(
 		// ...
 		'BricksClassLoader' => array(
-			'BricksClassLoader' => array(
+			'MyModuleNamespace' => array(
 				'classMap' => array(
-					'YourModule' =>
-						'YourNamespace' => array(
-							'classAlias' => 'YourModule\Class'
-							'setOfClasses' => array(
-								'class1' => 'YourModule\ClassOne',
-								'class2' => 'YourModule\ClassTwo',
-							),
-						),
-					),
+					'Path/To/Class' => 'Path/To/Other/Class' // only set if needed					
 				),
 			),			
 		),
@@ -70,20 +62,20 @@ This example will demonstrate the api that shouldn't change in future.
 ```php
 	// ...
 	// instantiate the class loader for your module
-	$classLoader = $serviceManager->get('BricksClassLoader')->getClassLoader('YourModule');
+	$classLoader = $serviceManager->get('BricksClassLoader');
 
 	// get a object
-	$object = $classLoader->newInstance(__CLASS__,__FUNCTION__,'classAlias','YourNamespace',array( // the factory parameters
+	$object = $classLoader->get('Path/To/Your/Class','OptionalNamespace',array( // the factory parameters
 		'AnyKey' => $anyVar,
 	));
 
 	// create a singleton
-	$object = $classLoader->getSingleton(__CLASS__,__FUNCTION__,'classAlias','YourNamespace',array(
+	$object = $classLoader->singleton('Path/To/Your/Class','OptionalNamespace',array(
 		'AnyKey' => $anyVar
 	));
 
 	// after this you can call the singleton everywhere in the code as follows
-	$object = $classLoader->getSingleton(__CLASS__,__METHOD__,'classAlias');
+	$object = $classLoader->singleton('Path/To/Your/Class');
 
 	// ...
 ```

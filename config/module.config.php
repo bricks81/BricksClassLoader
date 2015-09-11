@@ -9,18 +9,24 @@ return array(
 	'BricksConfig' => array(
 		'BricksClassLoader' => array( // Module to configure	
 			'BricksClassLoader' => array( // Namespace
-				'defaultFactories' => array(),
+				'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
+				'defaultFactories' => array(
+					'Bricks\ClassLoader\DefaultFactory'
+				),
 				'classMap' => array( 
-					'BricksClassLoader' => array( // Module to load from
-						'BricksClassLoader' => array( // Namespace
-							'classLoaderClass' => 'Bricks\ClassLoader\ClassLoader',
-							'defaultClassLoaderClass' => 'Bricks\ClassLoader\DefaultClassLoader',
-							'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
-							'defaultFactory' => 'Bricks\ClassLoader\DefaultFactory',							
-						),
-					),
+					'classLoaderClass' => 'Bricks\ClassLoader\ClassLoader',
+					'defaultClassLoaderClass' => 'Bricks\ClassLoader\DefaultClassLoader',
+					'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
+					'defaultFactory' => 'Bricks\ClassLoader\DefaultFactory',						
+					
 				),			
 			),
+			'BricksMapper' => array(
+				'classMap' => array(
+					'Bricks\Mapper\Mapper' => 'Bricks\Mapper\Mapper',
+				),
+			),
 		),	
+		
 	),
 );

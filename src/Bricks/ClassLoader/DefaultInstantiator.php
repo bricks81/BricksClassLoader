@@ -30,44 +30,37 @@ namespace Bricks\ClassLoader;
 class DefaultInstantiator implements InstantiatorInterface {
 	
 	/**
-	 * @var string|false
-	 */
-	protected $onClass = false;
-	
-	/**
-	 * @var string|false
-	 */
-	protected $onMethod = false;
-	
-	/**
 	 * @var ClassLoaderInterface
 	 */
 	protected $classLoader;
 	
-	public function getOnClass(){
-		return $this->onClass;
+	/**
+	 * @param ClassLoaderInterface $classLoader
+	 */
+	public function __construct(ClassLoaderInterface $classLoader){
+		$this->setClassLoader($classLoader);
 	}
 	
-	public function setOnClass($class){
-		$this->onClass = $class;		
-	}
-	
-	public function getOnMethod(){
-		return $this->onMethod;
-	}
-	
-	public function setOnMethod($method){
-		$this->onMethod = $method;
-	}
-	
+	/**
+	 * (non-PHPdoc)
+	 * @see \Bricks\ClassLoader\ClassLoaderAwareInterface::setClassLoader()
+	 */
 	public function setClassLoader($classLoader){
 		$this->classLoader = $classLoader;
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see \Bricks\ClassLoader\ClassLoaderAwareInterface::getClassLoader()
+	 */
 	public function getClassLoader(){
 		return $this->classLoader;
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see \Bricks\ClassLoader\InstantiatorInterface::instantiate()
+	 */
 	public function instantiate($class,array $params=array()){		
 		$params = array_values($params);
 		switch(count($params)){

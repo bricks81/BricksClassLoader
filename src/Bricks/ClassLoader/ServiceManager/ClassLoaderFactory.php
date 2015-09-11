@@ -38,7 +38,7 @@ class ClassLoaderFactory implements FactoryInterface {
 	 */
 	public function createService(ServiceLocatorInterface $sl){
 		$config = $sl->get('BricksConfig')->getConfig('BricksClassLoader');		
-		$class = $config->get('classMap.BricksClassLoader.BricksClassLoader.classLoaderClass');
+		$class = $config->get('classMap.classLoaderClass');
 		$service = new $class($config);
 		$service->setServiceLocator($sl);
 		return $service;
