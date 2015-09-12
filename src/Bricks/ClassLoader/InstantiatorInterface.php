@@ -30,26 +30,6 @@ namespace Bricks\ClassLoader;
 interface InstantiatorInterface extends ClassLoaderAwareInterface {
 	
 	/**
-	 * @return string
-	 */
-	public function getOnClass();
-	
-	/**
-	 * @param string $class
-	 */
-	public function setOnClass($class);
-	
-	/**
-	 * @return string
-	 */
-	public function getOnMethod();
-	
-	/**
-	 * @param string $method
-	 */
-	public function setOnMethod($method);
-	
-	/**
 	 * @param string $class
 	 * @param array $params
 	 */

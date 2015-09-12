@@ -53,34 +53,6 @@ interface FactoryInterface extends ClassLoaderAwareInterface {
 	public function setPriority($priority);
 	
 	/**
-	 * On which class will this factory be executed
-	 * 
-	 * @return string
-	 */
-	public function getOnClass();
-	
-	/**
-	 * @param string $class
-	 */
-	public function setOnClass($class);
-	
-	/**
-	 * On which method will this factory be executed
-	 */
-	public function getOnMethod();
-	
-	/**
-	 * @param string $method
-	 */
-	public function setOnMethod($method);
-	
-	/**
-	 * @param string $class	 
-	 * @return object
-	 */
-	public function instantiate($class,array $factoryParams=array());
-	
-	/**
 	 * @param object $object
 	 * @param array $factoryParams	 
 	 */

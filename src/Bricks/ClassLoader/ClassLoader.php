@@ -101,114 +101,79 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 * @param string $namespace
 	 * @return string
 	 */
-	public function getAliasClass($alias,$namespace){
+	public function aliasToClass($alias,$namespace=null){
 		$namespace = $namespace?:'BricksClassLoader';
-		$aliasMap = $this->getConfig()->get('aliasMap',$namespace);
-		$parts = explode('.',$alias);
-		if(1 == count($parts)){
-			while(isset($aliases[$alias])){
-				$key = $alias;
-				$alias = $aliases[$alias];
-				unset($aliases[$key]);
-			}
-			return $alias;
-		}
-	
-		$aliasName = array_pop($parts);
-		$pointer = &$aliases;
-		$classOrAlias = $alias;
-		if(0==count($parts)){
-			if(!isset($pointer[$aliasName])){
-				return $classOrAlias;
-			}
-			return $pointer[$aliasName];
-		}
-	
-		foreach($parts AS $key){
-			if(isset($pointer[$aliasName])) {
-				if(is_array($pointer[$aliasName])){
-					if(isset($pointer[$aliasName]['class'])){
-						$classOrAlias = $pointer[$aliasName]['class'];
-					}
-				} else {
-					$classOrAlias = $pointer[$aliasName];
-				}
-			}
-			if(isset($pointer[$key])){
-				$pointer = &$pointer[$key];
-			}
-		}
-		if(isset($pointer[$aliasName])){
-			if(is_array($pointer[$aliasName])){
-				if(isset($pointer[$aliasName]['class'])){
-					$classOrAlias = $pointer[$aliasName]['class'];
-				}
-			} else {
-				$classOrAlias = $pointer[$aliasName];
-			}
-		}
-	
-		while(isset($aliases[$classOrAlias])){
-			$key = $classOrAlias;
-			$classOrAlias = $aliases[$classOrAlias];
-			unset($aliases[$key]);
-		}
-	
-		return $classOrAlias;
+		$return = $this->getConfig()->get('aliasMap.'.$alias,$namespace);
+		return $return;
 	}
 	
 	/**
-	 * @param string $alias
+	 * @param string $class
 	 * @param string $namespace
+	 * @return string
 	 */
-	public function aliasToClass($alias,$namespace=null){
-		
+	public function getClassOverwrite($class,$namespace=null){
+		$return = null;
+		$namespace = $namespace?:'BricksClassLoader';
+		$classMap = $this->getConfig()->get('classMap',$namespace);
+		while(isset($classMap[$class])){
+			$ret = $classMap[$class];
+			unset($classMap[$class]);
+			$class = $ret;
+		}
+		return $class;
 	}
 	
 	/**
 	 * @param InstantiatorInterface $instantiator
-	 * @param string class
-	 * @param string namespace 
+	 * @param string $classOrAlias
+	 * @param string $namespace 
 	 */
-	public function setInstantiator(InstantiatorInterface $instantiator,$class,$namespace=null){
+	public function setInstantiator(InstantiatorInterface $instantiator,$classOrAlias,$namespace=null){
 		$namespace = $namespace?:'BricksClassLoader';
-		$class = $this->getConfig()->get('classMap.'.$class,$namespace)?:$class;
+		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class,$namespace);
 		if(!isset($this->instantiators[$class][$namespace])){
 			$this->instantiators[$class][$namespace] = $instantiator;
 		}
 	}
 	
 	/**
-	 * @param string $class
+	 * @param string $classOrAlias
 	 * @param string $namespace
 	 */
-	public function removeInstantiator($class,$namespace=null){
+	public function removeInstantiator($classOrAlias,$namespace=null){
 		$namespace = $namespace?:'BricksClassLoader';
-		$class = $this->getConfig()->get('classMap.'.$class,$namespace)?:$class;
+		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class,$namespace);
 		if(isset($this->instantiators[$class][$namespace])){
 			unset($this->instantiators[$class][$namespace]);
 		}
 	}
 	
 	/**
-	 * @param string $class
+	 * @param string $classOrAlias
 	 * @param string $namespace
 	 * @return InstantiatorInterface
 	 */
-	public function getInstantiator($class,$namespace=null){		
+	public function getInstantiator($classOrAlias,$namespace=null){		
 		$namespace = $namespace?:'BricksClassLoader';
-		$class = $this->getConfig()->get('classMap.'.$class,$namespace)?:$class;
+		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class,$namespace);
 		if(!isset($this->instantiators[$class][$namespace])){			
 			
 			// avoid loading many times the same object
-			$className = $this->getConfig()->get('defaultInstantiator',$namespace);
-			$className = $this->getConfig()->get('classMap.'.$className,$namespace)?:$class;
-			foreach($this->instantiators[$class] AS $ns => $instance){
-				if(get_class($instance) == $_inst){
-					$this->setInstantiator($instance,$className,$namespace);
-					break;					
-				}			
-			}	
+			$className = $this->aliasToClass('defaultInstantiator',$namespace);
+			$className = $this->getClassOverwrite($className,$namespace);
+			
+			if(isset($this->instantiators[$class])){
+				foreach($this->instantiators[$class] AS $ns => $instance){
+					if(get_class($instance) == $_inst){
+						$this->setInstantiator($instance,$className,$namespace);
+						break;					
+					}			
+				}	
+			}
 			
 			if(!isset($this->instantiators[$class][$namespace])){
 				$this->setInstantiator(new $className($this),$class,$namespace);
@@ -222,37 +187,40 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	
 	/**
 	 * @param FactoryInterface $factory
-	 * @param string $class
+	 * @param string $classOrAlias
 	 * @param string $namespace
 	 */
-	public function addFactory(FactoryInterface $factory,$class,$namespace=null){
+	public function addFactory(FactoryInterface $factory,$classOrAlias,$namespace=null){
 		$namespace = $namespace?:'BricksClassLoader';
-		$class = $this->getConfig()->get('classMap.'.$class,$namespace)?:$class;
+		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class,$namespace);
 		if(!isset($this->factories[$class][$namespace])){
 			$this->factories[$class][$namespace][] = $factory;
 		}		
 	}
 	
 	/**
-	 * @param string $class
+	 * @param string $classOrAlias
 	 * @param string $namespace
 	 */
-	public function removeFactory($class,$alias,$module,$namespace=null){
-		$namespace = $namespace?:$module;
-		$class = $this->getConfig()->get('classMap.'.$class,$namespace)?:$class;
+	public function removeFactory($classOrAlias,$alias,$module,$namespace=null){
+		$namespace = $namespace?:'BricksClassLoader';
+		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class,$namespace);
 		if(isset($this->factories[$class][$namespace])){
 			unset($this->factories[$class][$namespace]);
 		}
 	}
 	
 	/**
-	 * @param string $class
+	 * @param string $classOrAlias
 	 * @param string $namespace
 	 * @return array
 	 */
-	public function getFactories($class,$namespace=null){
-		$namespace = $namespace?:$module;
-		$class = $this->getConfig()->get('classMap.'.$class,$namespace)?:$class;		
+	public function getFactories($classOrAlias,$namespace=null){
+		$namespace = $namespace?:'BricksClassLoader';
+		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class,$namespace);		
 		if(!isset($this->factories[$class][$namespace])){
 
 			// avoid loading more than one time
@@ -288,28 +256,30 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	}
 	
 	/**
-	 * @param string $class
+	 * @param string $classOrAlias
 	 * @param string $namespace
 	 * @param array $params
 	 * @return object	 
 	 */
-	public function instantiate($class,$namespace=null,array $params=array()){
+	public function instantiate($classOrAlias,$namespace=null,array $params=array()){
 		$object = null;
 		$namespace = $namespace?:'BricksClassLoader';
-		$class = $this->getConfig()->get('classMap.'.$class,$namespace)?:$class;
+		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class,$namespace);
 		$instantiator = $this->getInstantiator($class,$namespace);		
 		return $instantiator->instantiate($class,$params);		
 	}
 
 	/**
 	 * @param object $object
-	 * @param string $class
+	 * @param string $classOrAlias
 	 * @param string $namespace
 	 * @param array $params
 	 */
-	public function factory($object,$class,$namespace=null,array $params=array()){
-		$namespace = $namespace?:'BricksClassLoader';	
-		$class = $this->getConfig()->get('classMap.'.$class,$namespace)?:$class;
+	public function factory($object,$classOrAlias,$namespace=null,array $params=array()){
+		$namespace = $namespace?:'BricksClassLoader';
+		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class,$namespace);
 		$factories = $this->getFactories($class,$namespace);
 		$this->sortFactories($factories);
 		foreach($factories AS $factory){
@@ -318,14 +288,15 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	}
 	
 	/**	
-	 * @param string $class
+	 * @param string $classOrAlias
 	 * @param string $namespace
 	 * @param array $params
 	 * @return object
 	 */
-	public function singleton($class,$namespace=null,array $params=array()){
+	public function singleton($classOrAlias,$namespace=null,array $params=array()){
 		$namespace = $namespace?:'BricksClassLoader';
-		$class = $this->getConfig()->get('aliasMap.'.$class,$namespace)?:$class;
+		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class,$namespace);
 		if(!isset($this->instances[$class][$namespace])){
 			$this->instances[$class][$namespace] = $this->get($class,$namespace,$params);
 		}		
@@ -334,26 +305,28 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	
 	/**
 	 * 
-	 * @param string $class
+	 * @param string $classOrAlias
 	 * @param string $namespace
 	 */
-	public function removeSingleton($class,$namespace=null){
+	public function removeSingleton($classOrAlias,$namespace=null){
 		$namespace = $namespace?:'BricksClassLoader';
-		$class = $this->getConfig()->get('aliasMap.'.$class,$namespace)?:$class;
+		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class,$namespace);
 		if(isset($this->instances[$class][$namespace])){
 			unset($this->instances[$class][$namespace]);
 		}
 	}
 	
 	/**
-	 * @param string $class
+	 * @param string $classOrAlias
 	 * @param string $namespace
 	 * @param array $params
 	 * @return object
 	 */
-	public function get($class,$namespace=null,array $params=array()){
+	public function get($classOrAlias,$namespace=null,array $params=array()){
 		$namespace = $namespace?:'BricksClassLoader';
-		$class = $this->getConfig()->get('aliasMap.'.$class,$namespace)?:$class;
+		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class,$namespace);
 		$object = $this->instantiate($class,$namespace,$params);		
 		$this->factory($object,$class,$namespace,$params);
 		return $object;

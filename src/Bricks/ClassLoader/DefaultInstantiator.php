@@ -27,7 +27,8 @@
 
 namespace Bricks\ClassLoader;
 
-class DefaultInstantiator implements InstantiatorInterface {
+class DefaultInstantiator 
+implements InstantiatorInterface {
 	
 	/**
 	 * @var ClassLoaderInterface
@@ -35,9 +36,9 @@ class DefaultInstantiator implements InstantiatorInterface {
 	protected $classLoader;
 	
 	/**
-	 * @param ClassLoaderInterface $classLoader
+	 * @param ClassLoader $classLoader
 	 */
-	public function __construct(ClassLoaderInterface $classLoader){
+	public function __construct(ClassLoader $classLoader){
 		$this->setClassLoader($classLoader);
 	}
 	
@@ -45,7 +46,7 @@ class DefaultInstantiator implements InstantiatorInterface {
 	 * (non-PHPdoc)
 	 * @see \Bricks\ClassLoader\ClassLoaderAwareInterface::setClassLoader()
 	 */
-	public function setClassLoader($classLoader){
+	public function setClassLoader(ClassLoader $classLoader){
 		$this->classLoader = $classLoader;
 	}
 	

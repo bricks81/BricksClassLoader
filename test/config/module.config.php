@@ -4,34 +4,32 @@ return array(
 		'BricksClassLoader' => array( // Module to configure
 			'BricksClassLoader' => array( // namespace
 				'defaultFactories' => array(),
-				'classMap' => array(
+				'classMap' => array(),
+				'aliasMap' => array(
 					'classLoaderClass' => 'Bricks\ClassLoader\ClassLoader',
 					'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
 					'defaultFactory' => 'Bricks\ClassLoader\DefaultFactory'
-				),
-				'aliasMap' => array()
+				)
 			),
 			'BricksClassLoaderTest' => array(
 				'aliasMap' => array(
-					'anyClass' => 'BricksClassLoaderTest\TestObject',
-					'anyClassExtended' => 'BricksClassLoaderTest\TestObjectExtended',
+					'classLoaderClass' => 'BricksClassLoaderTest\TestObject',
 					'deeper' => array(
 						'class' => array(
 							'hierarchy' => 'BricksClassLoaderTest\TestObject'
 						)
 					)
 				)
-			)
-		),
-		'BricksClassLoaderTest2' => array(
-			'classMap' => array(
-				'BricksClassLoaderTest\TestObjectExtended' => 'BricksClassLoaderTest\TestObjectExtended2',
-				'BricksClassLoaderTest\TestObject' => 'BricksClassLoaderTest\TestObject2'
 			),
-			'aliasMap' => array(
-				'deeper' => array(
-					'class' => array(
-						'hierarchy' => 'BricksClassLoaderTest\TestObject2'
+			'BricksClassLoaderTest2' => array(
+				'classMap' => array(
+					'Bricks\ClassLoader\ClassLoader' => 'BricksClassLoaderTest\TestObject2'
+				),
+				'aliasMap' => array(
+					'deeper' => array(
+						'class' => array(
+							'hierarchy' => 'BricksClassLoaderTest\TestObject2'
+						)	
 					)
 				)
 			)
