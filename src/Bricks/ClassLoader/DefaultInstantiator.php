@@ -62,7 +62,10 @@ implements InstantiatorInterface {
 	 * (non-PHPdoc)
 	 * @see \Bricks\ClassLoader\InstantiatorInterface::instantiate()
 	 */
-	public function instantiate($class,array $params=array()){		
+	public function instantiate($class,array $params=array()){
+		if(!class_exists($class,true)){
+			throw new \RuntimeException('given class '.$class.' not exists');
+		}		
 		$params = array_values($params);
 		switch(count($params)){
 			case 0: return new $class(); break;

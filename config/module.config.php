@@ -10,30 +10,15 @@ return array(
 		'BricksClassLoader' => array( // Module to configure	
 			'BricksClassLoader' => array( // Namespace
 				'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
-				'defaultFactories' => array(
-					'Bricks\ClassLoader\DefaultFactory'
-				),
-				'classMap' => array( 
-					'classLoaderClass' => 'Bricks\ClassLoader\ClassLoader',
-					'defaultClassLoaderClass' => 'Bricks\ClassLoader\DefaultClassLoader',
-					'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
-					'defaultFactory' => 'Bricks\ClassLoader\DefaultFactory',						
-					
-				),
+				'classMap' => array(),
 				'aliasMap' => array(
-					'user' => array(
-						'userClass' => 'Default\User\Class',
-						'deeper' => array(
-							'useClass' => 'Other\User\Class', 
-						),
+					'classLoaderClass' => 'Bricks\ClassLoader\ClassLoader',
+					'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
+					'defaultFactories' => array(
+						'defaultFactory' => 'Bricks\ClassLoader\DefaultFactory',
 					),
 				),			
-			),
-			'BricksMapper' => array(
-				'classMap' => array(
-					'Bricks\Mapper\Mapper' => 'Bricks\Mapper\Mapper',
-				),
-			),
+			),			
 		),	
 		
 	),

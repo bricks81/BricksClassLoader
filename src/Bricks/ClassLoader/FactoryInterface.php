@@ -30,19 +30,6 @@ namespace Bricks\ClassLoader;
 interface FactoryInterface extends ClassLoaderAwareInterface {
 	
 	/**
-	 * If this factory can instantiate a new class
-	 * There can only be one instantiator on factory stack 
-	 * 
-	 * @return bool
-	 */
-	public function isInstantiator();
-
-	/**
-	 * @param boolean $bool
-	 */
-	public function setIsInstantiator($bool);
-	
-	/**
 	 * @return int
 	 */
 	public function getPriority();

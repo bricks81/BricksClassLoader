@@ -30,16 +30,10 @@ class ClassLoaderTest extends PHPUnit_Framework_TestCase {
 		$class = $classLoader->aliasToClass('classLoaderClass','BricksClassLoaderTest');
 		$this->assertEquals('BricksClassLoaderTest\TestObject',$class);
 	
-		$class = $classLoader->aliasToClass('classLoaderClass','BricksClassLoaderTest2');
-		$this->assertEquals('BricksClassLoaderTest\TestObject2',$class);
-		
-		$class = $classLoader->aliasToClass('depper.class.hierarchy','BricksClassLoader');
+		$class = $classLoader->aliasToClass('deeper.class.hierarchy','BricksClassLoaderTest');
 		$this->assertEquals('BricksClassLoaderTest\TestObject',$class);
 		
-		$class = $classLoader->aliasToClass('depper.class.hierarchy','BricksClassLoaderTest');
-		$this->assertEquals('BricksClassLoaderTest\TestObject',$class);
-		
-		$class = $classLoader->aliasToClass('depper.class.hierarchy','BricksClassLoaderTest2');
+		$class = $classLoader->aliasToClass('deeper.class.hierarchy','BricksClassLoaderTest2');
 		$this->assertEquals('BricksClassLoaderTest\TestObject2',$class);
 	}
 	
@@ -54,12 +48,12 @@ class ClassLoaderTest extends PHPUnit_Framework_TestCase {
 		$object = $classLoader->get('classLoaderClass','BricksClassLoaderTest',array(
 			'Config' => $classLoader->getConfig()
 		));
-		$this->assertInstanceOf('BricksClassLoaderTest\TestObject');
+		$this->assertInstanceOf('BricksClassLoaderTest\TestObject',$object);
 		
 		$object = $classLoader->get('classLoaderClass','BricksClassLoaderTest2',array(
 			'Config' => $classLoader->getConfig()
 		));
-		$this->assertInstanceOf('BricksClassLoaderTest\TestObject2');
+		$this->assertInstanceOf('BricksClassLoaderTest\TestObject2',$object);
 		
 		$object = $classLoader->get('Bricks\ClassLoader\ClassLoader','BricksClassLoader',array(
 			'Config' => $classLoader->getConfig()
@@ -70,9 +64,6 @@ class ClassLoaderTest extends PHPUnit_Framework_TestCase {
 			'Config' => $classLoader->getConfig()
 		));
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObject2',$object);
-		
-		$object = $classLoader->get('deeper.class.hierarchy','BricksClassLoader');
-		$this->assertInstanceOf('BricksClassLoaderTest\TestObject',$object);
 		
 		$object = $classLoader->get('deeper.class.hierarchy','BricksClassLoaderTest');
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObject',$object);
