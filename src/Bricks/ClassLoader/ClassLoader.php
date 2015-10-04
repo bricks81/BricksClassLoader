@@ -359,6 +359,9 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 * @return object
 	 */
 	public function get($classOrAlias,$namespace=null,array $params=array()){
+		if(!is_string($classOrAlias)){
+			throw new \RuntimeException('invalid class or alias');
+		}
 		$namespace = $namespace?:'BricksClassLoader';
 		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
 		$class = $this->getClassOverwrite($class,$namespace);
