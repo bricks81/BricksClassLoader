@@ -12,11 +12,13 @@ return array(
 				'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
 				'classMap' => array(),
 				'aliasMap' => array(
-					'classLoaderClass' => 'Bricks\ClassLoader\ClassLoader',
-					'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
-					'defaultFactories' => array(
-						'defaultFactory' => 'Bricks\ClassLoader\DefaultFactory',
-					),
+					'BricksClassLoader' => array(
+						'classLoaderClass' => 'Bricks\ClassLoader\ClassLoader',
+						'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
+						'defaultFactories' => array(
+							'defaultFactory' => 'Bricks\ClassLoader\DefaultFactory',
+						),
+					),					
 				),			
 			),			
 		),	

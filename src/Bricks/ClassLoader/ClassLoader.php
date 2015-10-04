@@ -97,13 +97,67 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	}
 	
 	/**
+	 * @param string $namespace
+	 * @return array
+	 */
+	public function getAliasMap($namespace=null){
+		$config = $this->getConfig()->getZendConfig()->BricksConfig->BricksClassLoader->toArray();
+		$aliasMap = array();
+		foreach($config AS $ns => $config){
+			if('BricksClassLoader' == $ns){
+				continue;
+			}
+			if($namespace == $ns){
+				continue;
+			}
+			if(isset($config['aliasMap'])){
+				$aliasMap = array_replace_recursive($aliasMap,$config['aliasMap']);
+			}			
+		}
+		if(isset($config['BricksClassLoader'])){
+			$aliasMap = array_replace_recursive($aliasMap,$config['BricksClassLoader']);
+		}
+		if(isset($config[$namespace]['aliasMap'])){
+			$aliasMap = array_replace_recursive($aliasMap,$config[$namespace]['aliasMap']);
+		}
+		return $aliasMap;
+	}	
+	
+	/**
+	 * @param string $namespace
+	 * @return array
+	 */
+	public function getClassMap($namespace=null){
+		$config = $this->getConfig()->getZendConfig()->BricksConfig->BricksClassLoader->toArray();
+		$classMap = array();
+		foreach($config AS $ns => $config){
+			if('BricksClassLoader' == $ns){
+				continue;
+			}
+			if($namespace == $ns){
+				continue;
+			}
+			if(isset($config['classMap'])){
+				$classMap = array_replace_recursive($classMap,$config['classMap']);
+			}
+		}
+		if(isset($config['BricksClassLoader'])){
+			$classMap = array_replace_recursive($classMap,$config['BricksClassLoader']);
+		}
+		if(isset($config[$namespace]['classMap'])){
+			$classMap = array_replace_recursive($classMap,$config[$namespace]['classMap']);
+		}
+		return $classMap;
+	}
+	
+	/**
 	 * @param string $alias
 	 * @param string $namespace
 	 * @return string|null
 	 */
 	public function aliasToClass($alias,$namespace=null){
 		$namespace = $namespace?:'BricksClassLoader';
-		$aliasMap = $this->getConfig()->get('aliasMap',$namespace);
+		$aliasMap = $this->getAliasMap($namespace);
 		$parts = explode('.',$alias);
 		$class = null;
 		$name = array_pop($parts);
@@ -133,7 +187,7 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	public function getClassOverwrite($class,$namespace=null){
 		$return = null;
 		$namespace = $namespace?:'BricksClassLoader';
-		$classMap = $this->getConfig()->get('classMap',$namespace);
+		$classMap = $this->getClassMap($namespace);
 		while(isset($classMap[$class])){
 			$ret = $classMap[$class];
 			if(is_array($ret) && isset($ret['class'])){
@@ -205,7 +259,10 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 				}			
 			}
 			
-			if(!isset($this->instantiators[$class][$namespace])){				
+			if(!isset($this->instantiators[$class][$namespace])){
+				if(!class_exists($instantiatorClass,true)){
+					throw new \RuntimeException('given class '.$instantiatorClass.' not exists');
+				}				
 				$this->setInstantiator(new $instantiatorClass($this),$class,$namespace);
 			}
 			
