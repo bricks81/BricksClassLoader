@@ -47,7 +47,9 @@ Add the configuration for your module:
 		'BricksClassLoader' => array(
 			'MyModuleNamespace' => array(
 				'classMap' => array(
-					'Path/To/Class' => 'Path/To/Other/Class' // only set if needed					
+					'MyModuleNamespace' => array(
+						'Path/To/Class' => 'Path/To/Other/Class' // only set if needed
+					),
 				),
 			),			
 		),
@@ -69,10 +71,14 @@ This example will demonstrate the api that shouldn't change in future.
 		'AnyKey' => $anyVar,
 	));
 
+	$object = $classLoader->get('BricksPlugin.pluginClass','BricksPlugin');
+
 	// create a singleton
 	$object = $classLoader->singleton('Path/To/Your/Class','OptionalNamespace',array(
 		'AnyKey' => $anyVar
 	));
+
+	$object = $classLoader->singleton('BricksPlugin.pluginClass','BricksPlugin');
 
 	// after this you can call the singleton everywhere in the code as follows
 	$object = $classLoader->singleton('Path/To/Your/Class');

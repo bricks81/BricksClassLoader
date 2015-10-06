@@ -8,9 +8,7 @@ return array(
 	),
 	'BricksConfig' => array(
 		'BricksClassLoader' => array( // Module to configure	
-			'BricksClassLoader' => array( // Namespace
-				'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
-				'classMap' => array(),
+			'BricksClassLoader' => array( // Module Namespace
 				'aliasMap' => array(
 					'BricksClassLoader' => array(
 						'classLoaderClass' => 'Bricks\ClassLoader\ClassLoader',
@@ -18,8 +16,21 @@ return array(
 						'defaultFactories' => array(
 							'defaultFactory' => 'Bricks\ClassLoader\DefaultFactory',
 						),
+					),
+				),	
+				'classMap' => array(
+					'BricksClassLoader' => array(
+						/*						
+						'My/Class' => array(
+							'class' => 'My/Class',
+							'instantiator' => 'My/Class',
+							'factories' => array(
+								'order' => 'My/Factory',
+							),
+						),
+						*/
 					),					
-				),			
+				),		
 			),			
 		),	
 		

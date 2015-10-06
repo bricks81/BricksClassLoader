@@ -101,51 +101,23 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 * @return array
 	 */
 	public function getAliasMap($namespace=null){
-		$config = $this->getConfig()->getZendConfig()->BricksConfig->BricksClassLoader->toArray();
-		$aliasMap = array();
-		foreach($config AS $ns => $config){
-			if('BricksClassLoader' == $ns){
-				continue;
-			}
-			if($namespace == $ns){
-				continue;
-			}
-			if(isset($config['aliasMap'])){
-				$aliasMap = array_replace_recursive($aliasMap,$config['aliasMap']);
-			}			
-		}
-		if(isset($config['BricksClassLoader'])){
-			$aliasMap = array_replace_recursive($aliasMap,$config['BricksClassLoader']);
-		}
-		if(isset($config[$namespace]['aliasMap'])){
-			$aliasMap = array_replace_recursive($aliasMap,$config[$namespace]['aliasMap']);
+		$namespace = $namespace?:'BricksClassLoader';
+		$aliasMap = $this->getConfig()->get('aliasMap','BricksClassLoader');
+		if('BricksClassLoader' != $namespace){
+			$aliasMap = array_replace_recursive($aliasMap,$this->getConfig()->get('aliasMap',$namespace));
 		}
 		return $aliasMap;
-	}	
+	}
 	
 	/**
 	 * @param string $namespace
 	 * @return array
 	 */
 	public function getClassMap($namespace=null){
-		$config = $this->getConfig()->getZendConfig()->BricksConfig->BricksClassLoader->toArray();
-		$classMap = array();
-		foreach($config AS $ns => $config){
-			if('BricksClassLoader' == $ns){
-				continue;
-			}
-			if($namespace == $ns){
-				continue;
-			}
-			if(isset($config['classMap'])){
-				$classMap = array_replace_recursive($classMap,$config['classMap']);
-			}
-		}
-		if(isset($config['BricksClassLoader'])){
-			$classMap = array_replace_recursive($classMap,$config['BricksClassLoader']);
-		}
-		if(isset($config[$namespace]['classMap'])){
-			$classMap = array_replace_recursive($classMap,$config[$namespace]['classMap']);
+		$namespace = $namespace?:'BricksClassLoader';
+		$classMap = $this->getConfig()->get('classMap','BricksClassLoader');
+		if('BricksClassLoader' != $namespace){
+			$classMap = array_replace_recursive($classMap,$this->getConfig()->get('classMap',$namespace));
 		}
 		return $classMap;
 	}
