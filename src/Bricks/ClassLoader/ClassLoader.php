@@ -157,20 +157,20 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 	 * @return string
 	 */
 	public function getClassOverwrite($class,$namespace=null){
-		$return = null;
+		$return = $class;		
 		$namespace = $namespace?:'BricksClassLoader';
 		$classMap = $this->getClassMap($namespace);
 		while(isset($classMap[$class])){
-			$ret = $classMap[$class];
-			if(is_array($ret) && isset($ret['class'])){
-				$ret = $ret['class'];
-			} elseif(is_array($ret) && count($ret) > 0){
-				$ret = array_slice($ret,0,1);
+			$return = $classMap[$class];
+			if(is_array($return) && isset($return['class'])){
+				$return = $return['class'];
+			} elseif(is_array($return) && count($return) > 0){
+				$return = array_slice($ret,0,1);
 			}
 			unset($classMap[$class]);
-			$class = $ret;
-		}
-		return $class;
+			$class = $return;			
+		}		
+		return $return;
 	}
 	
 	/**
@@ -217,7 +217,7 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 			}
 			
 			$classMap = $this->getConfig()->get('classMap',$namespace);	
-			$instantiatorClass = $this->aliasToClass('defaultInstantiator',$namespace);						
+			$instantiatorClass = $this->aliasToClass('BricksClassLoader.defaultInstantiator',$namespace);						
 			$instantiatorClass = $this->getClassOverwrite($instantiatorClass,$namespace);
 			if(isset($classMap[$class]['instantiator'])){
 				$instantiatorClass = $classMap[$class]['instantiator'];
@@ -287,13 +287,15 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 			}
 			
 			// avoid loading more than one time			
-			$array = $this->getConfig()->get('aliasMap.defaultFactories',$namespace);
+			$array = $this->getConfig()->get('aliasMap.BricksClassLoader.defaultFactories',$namespace);
 			foreach($array AS $key => $className){				
 				$className = $this->getClassOverwrite($className,$namespace);
-				foreach($this->factories[$class] AS $ns => $instance){
-					if(get_class($instance) == $className){
-						$this->addFactory($instance,$class,$namespace);
-						unset($array[$key]);						
+				foreach($this->factories[$class] AS $ns => $instances){
+					foreach($instances AS $instance){					
+						if(get_class($instance) == $className){
+							$this->addFactory($instance,$class,$namespace);
+							unset($array[$key]);
+						}				
 					}
 				}
 			}
