@@ -350,7 +350,7 @@ class ClassLoader implements ServiceLocatorAwareInterface {
 		$this->sortFactories($factories);
 		foreach($factories AS $factory){
 			$factory->build($object,$params);
-		}		
+		}
 	}
 	
 	/**	
