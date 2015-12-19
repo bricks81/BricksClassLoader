@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  */
 
-namespace Bricks\ClassLoader;
+namespace Bricks\ClassLoader\Factories;
 
 interface FactoryInterface extends ClassLoaderAwareInterface {
 	

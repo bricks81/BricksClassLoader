@@ -15,7 +15,7 @@
  *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,14 +25,22 @@
  * THE SOFTWARE.
  */
 
-namespace Bricks\ClassLoader;
+namespace Bricks\ClassLoader\Factories;
 
-interface InstantiatorInterface extends ClassLoaderAwareInterface {
+use Bricks\ClassLoader\Factories\DefaultFactory;
+use Bricks\ClassLoader\ClassLoaderAwareInterface;
+
+class ClassLoaderAwareFactory extends DefaultFactory {
 	
 	/**
-	 * @param string $class
-	 * @param array $params
+	 * @param object $object
+	 * @param array $factoryParams
 	 */
-	public function instantiate($class,array $params=array());
+	public function build($object,array $factoryParams=array()){
+		$classLoader = $this->getClassLoader();
+		if($object instanceof ClassLoaderAwareInterface){
+			$object->setClassLoader($classLoader);
+		}
+	}
 	
 }

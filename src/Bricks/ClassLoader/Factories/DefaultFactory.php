@@ -25,21 +25,41 @@
  * THE SOFTWARE.
  */
 
-namespace Bricks\ClassLoader;
+namespace Bricks\ClassLoader\Factories;
 
-class DefaultInstantiator 
-implements InstantiatorInterface {
+use Bricks\ClassLoader\ClassLoader;
+
+class DefaultFactory implements FactoryInterface {
 	
 	/**
-	 * @var ClassLoaderInterface
+	 * @var integer
+	 */
+	protected $priority = 0;
+	
+	/**
+	 * @var ClassLoader
 	 */
 	protected $classLoader;
 	
-	/**
-	 * @param ClassLoader $classLoader
-	 */
-	public function __construct(ClassLoader $classLoader){
+	public function __construct(ClassLoader $classLoader,$priority=0){
 		$this->setClassLoader($classLoader);
+		$this->setPriority($priority);
+	}
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see \Bricks\ClassLoader\FactoryInterface::getPriority()
+	 */
+	public function getPriority(){
+		return $this->priority;
+	}
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see \Bricks\ClassLoader\FactoryInterface::setPriority()
+	 */
+	public function setPriority($priority){
+		$this->priority = $priority;
 	}
 	
 	/**
@@ -60,27 +80,16 @@ implements InstantiatorInterface {
 	
 	/**
 	 * (non-PHPdoc)
-	 * @see \Bricks\ClassLoader\InstantiatorInterface::instantiate()
+	 * @see \Bricks\ClassLoader\FactoryInterface::build()
 	 */
-	public function instantiate($class,array $params=array()){
-		if(!class_exists($class,true)){
-			throw new \RuntimeException('given class '.$class.' not exists');
-		}		
-		$params = array_values($params);
-		switch(count($params)){
-			case 0: return new $class(); break;
-			case 1: return new $class($params[0]); break;
-			case 2: return new $class($params[0],$params[1]); break;
-			case 3: return new $class($params[0],$params[1],$params[2]); break;
-			case 4: return new $class($params[0],$params[1],$params[2],$params[3]); break;
-			case 5: return new $class($params[0],$params[1],$params[2],$params[3],$params[4]); break;
-			case 6: return new $class($params[0],$params[1],$params[2],$params[3],$params[4],$params[5]); break;
-			case 7: return new $class($params[0],$params[1],$params[2],$params[3],$params[4],$params[5],$params[6]); break;
-			case 8: return new $class($params[0],$params[1],$params[2],$params[3],$params[4],$params[5],$params[6],$params[7]); break;
-			default:
-				$relection = new \ReflectionObject($class);
-				return $reflection->newInstanceArgs($params);
+	public function build($object,array $factoryParams=array()){
+		foreach($factoryParams AS $name => $var){
+			$method = 'set'.ucfirst($name);
+			if(method_exists($object,$method)){
+				$object->$method($var);
+			}
 		}
-	}
+		return $object;
+	}	
 	
 }

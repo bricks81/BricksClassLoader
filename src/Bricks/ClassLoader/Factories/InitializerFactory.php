@@ -15,7 +15,7 @@
  *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,30 +25,20 @@
  * THE SOFTWARE.
  */
 
-namespace Bricks\ClassLoader\ServiceManager;
+namespace Bricks\ClassLoader\Factories;
 
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Bricks\Config\ConfigAwareInterface;
-
-class ClassLoaderFactory implements FactoryInterface {
+class InitializerFactory extends DefaultFactory {
+	
+	protected $priority = 10000;
 	
 	/**
-	 * (non-PHPdoc)
-	 * @see \Zend\ServiceManager\FactoryInterface::createService()
+	 * {@inheritDoc}
+	 * @see \Bricks\ClassLoader\FactoryInterface::build()
 	 */
-	public function createService(ServiceLocatorInterface $sl){
-		$config = $sl->get('BricksConfig');		
-		$class = $config->get('BricksClassLoader.classLoaderClass');		
-		$service = new $class;
-		if($service instanceof ConfigAwareInterface){
-			$service->setConfig($config);
-		}
-		if($service instanceof ServiceLocatorAwareInterface){
-			$service->setServiceLocator($sl);
-		}
-		return $service;
+	public function build($object,array $factoryParams=array()){
+		if(method_exists($object,'initialize')){
+			$object->initialize($factoryParams);
+		}		
 	}
 	
 }

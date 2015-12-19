@@ -25,30 +25,14 @@
  * THE SOFTWARE.
  */
 
-namespace Bricks\ClassLoader\ServiceManager;
+namespace Bricks\ClassLoader\Instantiators;
 
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Bricks\Config\ConfigAwareInterface;
-
-class ClassLoaderFactory implements FactoryInterface {
+interface InstantiatorInterface {
 	
 	/**
-	 * (non-PHPdoc)
-	 * @see \Zend\ServiceManager\FactoryInterface::createService()
+	 * @param string $class
+	 * @param array $params
 	 */
-	public function createService(ServiceLocatorInterface $sl){
-		$config = $sl->get('BricksConfig');		
-		$class = $config->get('BricksClassLoader.classLoaderClass');		
-		$service = new $class;
-		if($service instanceof ConfigAwareInterface){
-			$service->setConfig($config);
-		}
-		if($service instanceof ServiceLocatorAwareInterface){
-			$service->setServiceLocator($sl);
-		}
-		return $service;
-	}
+	public function instantiate($class,array $params=array());
 	
 }
