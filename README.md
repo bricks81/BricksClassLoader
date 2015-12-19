@@ -44,11 +44,20 @@ Add the configuration for your module:
 	// ...
 	'BricksConfig' => array(
 		// ...
-		'BricksClassLoader' => array(
-			'MyModuleNamespace' => array(
+		'__DEFAULT_NAMESPACE__' => array(
+			'BricksClassLoader' => array(		
+				'aliasMap' => array(
+					'MyModule' => array(
+						'alias' => 'A\Class',
+						'A\Class' => 'Path\To\Class',
+					),
+				),	
 				'classMap' => array(
-					'MyModuleNamespace' => array(
-						'Path/To/Class' => 'Path/To/Other/Class' // only set if needed
+					'Path\To\Class' => array(
+						'instantiator' => 'Instantiator\Class',
+						'factories' => array(
+							'List\Of\Factories'
+						),
 					),
 				),
 			),			
@@ -67,18 +76,21 @@ This example will demonstrate the api that shouldn't change in future.
 	$classLoader = $serviceManager->get('BricksClassLoader');
 
 	// get a object
-	$object = $classLoader->get('Path/To/Your/Class','OptionalNamespace',array( // the factory parameters
+	$object = $classLoader->get('Path/To/Your/Class',array( // the factory parameters
 		'AnyKey' => $anyVar,
 	));
 
-	$object = $classLoader->get('BricksPlugin.pluginClass','BricksPlugin');
+	// diffrent Namespace
+	$classLoader->getConfig()->setNamespace('YourNamespace');
+	$object = $classLoader->get('BricksPlugin.pluginClass');
+	$classLoader->resetNamespace();
 
 	// create a singleton
-	$object = $classLoader->singleton('Path/To/Your/Class','OptionalNamespace',array(
+	$object = $classLoader->singleton('Path/To/Your/Class',array(
 		'AnyKey' => $anyVar
 	));
 
-	$object = $classLoader->singleton('BricksPlugin.pluginClass','BricksPlugin');
+	$object = $classLoader->singleton('BricksPlugin.pluginClass');
 
 	// after this you can call the singleton everywhere in the code as follows
 	$object = $classLoader->singleton('Path/To/Your/Class');
