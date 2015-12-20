@@ -27,7 +27,7 @@
 
 namespace Bricks\ClassLoader\Factories;
 
-interface FactoryInterface extends ClassLoaderAwareInterface {
+interface FactoryInterface {
 	
 	/**
 	 * @return int

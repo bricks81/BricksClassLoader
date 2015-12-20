@@ -270,14 +270,14 @@ class ClassLoader implements ServiceLocatorAwareInterface,
 		$defaultFactories = $this->getConfig()->get('BricksClassLoader.defaultFactories');
 		$factories = $this->getConfig()->get('BricksClassLoader.factories.'.$class);
 		$return = array();
-		foreach($defaultFactories AS $factory){
+		foreach($defaultFactories AS $factory){			
 			if(!isset($this->instances[$factory][$namespace])){
 				$this->instances[$factory][$namespace] = new $factory($this);
 			}
 			$return[] = $this->instances[$factory][$namespace];
 		}
 		if($factories){
-			foreach($factories AS $factory){
+			foreach($factories AS $factory){				
 				if(!isset($this->instances[$factory][$namespace])){
 					$this->instances[$factory][$namespace] = new $factory($this);
 				}
@@ -292,8 +292,8 @@ class ClassLoader implements ServiceLocatorAwareInterface,
 	 */
 	public function sortFactories(array &$factories){
 		usort($factories,function($a,$b){
-			return $a->getPriority()>$b->getPriority()?$a:$b;
-		});
+			return $a->getPriority()>$b->getPriority()?1:0;
+		});		
 	}
 	
 	/**
@@ -304,7 +304,9 @@ class ClassLoader implements ServiceLocatorAwareInterface,
 	public function instantiate($classOrAlias,array $params=array()){
 		$object = null;
 		$namespace = $this->getConfig()->getNamespace();
-		$instantiator = $this->getInstantiator($classOrAlias);		
+		$class = $this->aliasToClass($classOrAlias)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class);
+		$instantiator = $this->getInstantiator($class);		
 		return $instantiator->instantiate($class,$params);		
 	}
 

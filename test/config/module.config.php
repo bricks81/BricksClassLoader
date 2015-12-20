@@ -1,18 +1,22 @@
 <?php
 return array(
 	'BricksConfig' => array(
-		'BricksClassLoader' => array( // Module to configure
-			'BricksClassLoader' => array( // namespace
+		'__DEFAULT_NAMESPACE__' => array(
+			'BricksClassLoader' => array(
+				'classLoaderClass' => 'Bricks\ClassLoader\ClassLoader',
+				'defaultInstantiator' => 'Bricks\ClassLoader\Instantiators\DefaultInstantiator',
+				'defaultFactories' => array(
+					'Bricks\ClassLoader\Factories\DefaultFactory',
+					'Bricks\ClassLoader\Factories\ClassLoaderAwareFactory',
+				),
 				'classMap' => array(),
 				'aliasMap' => array(
 					'classLoaderClass' => 'Bricks\ClassLoader\ClassLoader',
-					'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
-					'defaultFactories' => array(
-						'defaultFactory' => 'Bricks\ClassLoader\DefaultFactory'
-					),
-				)
+				),
 			),
-			'BricksClassLoaderTest' => array(
+		),
+		'BricksClassLoaderTest' => array(
+			'BricksClassLoader' => array(
 				'aliasMap' => array(
 					'classLoaderClass' => 'BricksClassLoaderTest\TestObject',
 					'deeper' => array(
@@ -22,13 +26,11 @@ return array(
 					)
 				)
 			),
-			'BricksClassLoaderTest2' => array(
+		),
+		'BricksClassLoaderTest2' => array(
+			'BricksClassLoader' => array(
 				'classMap' => array(
-					'Bricks\ClassLoader\ClassLoader' => array(
-						'class' => 'BricksClassLoaderTest\TestObject2',
-						//'instantiator',
-						//'factories',
-					),
+					'Bricks\ClassLoader\ClassLoader' => 'BricksClassLoaderTest\TestObject2',
 				),
 				'aliasMap' => array(					
 					'deeper' => array(

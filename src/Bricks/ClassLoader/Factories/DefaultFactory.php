@@ -28,8 +28,10 @@
 namespace Bricks\ClassLoader\Factories;
 
 use Bricks\ClassLoader\ClassLoader;
+use Bricks\ClassLoader\ClassLoaderAwareInterface;
+use Bricks\ClassLoader\ClassLoaderInterface;
 
-class DefaultFactory implements FactoryInterface {
+class DefaultFactory implements FactoryInterface, ClassLoaderAwareInterface {
 	
 	/**
 	 * @var integer
@@ -41,7 +43,7 @@ class DefaultFactory implements FactoryInterface {
 	 */
 	protected $classLoader;
 	
-	public function __construct(ClassLoader $classLoader,$priority=0){
+	public function __construct(ClassLoaderInterface $classLoader,$priority=0){
 		$this->setClassLoader($classLoader);
 		$this->setPriority($priority);
 	}
@@ -66,7 +68,7 @@ class DefaultFactory implements FactoryInterface {
 	 * (non-PHPdoc)
 	 * @see \Bricks\ClassLoader\ClassLoaderAwareInterface::setClassLoader()
 	 */
-	public function setClassLoader(ClassLoader $classLoader){
+	public function setClassLoader(ClassLoaderInterface $classLoader){
 		$this->classLoader = $classLoader;
 	}
 	

@@ -10,9 +10,10 @@ use BricksClassLoaderTest\Bootstrap;
 class ClassLoaderTest extends PHPUnit_Framework_TestCase {
 	
 	public function getInstance($config=null){
-		$config = null==$config?Bootstrap::getServiceManager()->get('BricksConfig')->getConfig('BricksClassLoader'):$config;
-		$classLoaderClass = $config->get('aliasMap.classLoaderClass','BricksClassLoader');
-		$classLoader = new $classLoaderClass($config);
+		$config = null==$config?Bootstrap::getServiceManager()->get('BricksConfig'):$config;
+		$classLoaderClass = $config->get('BricksClassLoader.aliasMap.classLoaderClass','BricksClassLoader');
+		$classLoader = new $classLoaderClass();
+		$classLoader->setConfig($config);
 		return $classLoader;
 	}
 	
@@ -24,52 +25,63 @@ class ClassLoaderTest extends PHPUnit_Framework_TestCase {
 	public function testAlias(){
 		$classLoader = $this->getInstance();
 	
-		$class = $classLoader->aliasToClass('classLoaderClass','BricksClassLoader');
+		$class = $classLoader->aliasToClass('BricksClassLoader.classLoaderClass');
 		$this->assertEquals('Bricks\ClassLoader\ClassLoader',$class);
 	
-		$class = $classLoader->aliasToClass('classLoaderClass','BricksClassLoaderTest');
-		$this->assertEquals('BricksClassLoaderTest\TestObject',$class);
-	
-		$class = $classLoader->aliasToClass('deeper.class.hierarchy','BricksClassLoaderTest');
+		$classLoader->getConfig()->setNamespace('BricksClassLoaderTest');
+		
+		$class = $classLoader->aliasToClass('BricksClassLoader.classLoaderClass');
 		$this->assertEquals('BricksClassLoaderTest\TestObject',$class);
 		
-		$class = $classLoader->aliasToClass('deeper.class.hierarchy','BricksClassLoaderTest2');
+		$class = $classLoader->aliasToClass('deeper.class.hierarchy');
+		$this->assertEquals('BricksClassLoaderTest\TestObject',$class);
+		
+		$classLoader->getConfig()->resetNamespace();
+		$classLoader->getConfig()->setNamespace('BricksClassLoaderTest2');
+		
+		$class = $classLoader->aliasToClass('deeper.class.hierarchy');
 		$this->assertEquals('BricksClassLoaderTest\TestObject2',$class);
+		
+		$classLoader->getConfig()->resetNamespace();
 	}
 	
 	public function testClassLoader(){
-		$classLoader = $this->getInstance();	
+		$classLoader = $this->getInstance();
 		
-		$object = $classLoader->get('classLoaderClass','BricksClassLoader',array(
-			'Config' => $classLoader->getConfig()
+		$class = $classLoader->getConfig()->get('BricksClassLoader.classLoaderClass');
+		$object = $classLoader->get($class,array(
+			'BricksConfig' => $classLoader->getConfig()
 		));
 		$this->assertInstanceOf('Bricks\ClassLoader\ClassLoader',$object);		
-		
-		$object = $classLoader->get('classLoaderClass','BricksClassLoaderTest',array(
-			'Config' => $classLoader->getConfig()
-		));
-		$this->assertInstanceOf('BricksClassLoaderTest\TestObject',$object);
-		
-		$object = $classLoader->get('classLoaderClass','BricksClassLoaderTest2',array(
-			'Config' => $classLoader->getConfig()
-		));
-		$this->assertInstanceOf('BricksClassLoaderTest\TestObject2',$object);
-		
-		$object = $classLoader->get('Bricks\ClassLoader\ClassLoader','BricksClassLoader',array(
-			'Config' => $classLoader->getConfig()
+		$object = $classLoader->get('Bricks\ClassLoader\ClassLoader',array(
+			'BricksConfig' => $classLoader->getConfig()
 		));
 		$this->assertInstanceOf('Bricks\ClassLoader\ClassLoader',$object);
 		
-		$object = $classLoader->get('Bricks\ClassLoader\ClassLoader','BricksClassLoaderTest2',array(
-			'Config' => $classLoader->getConfig()
-		));
-		$this->assertInstanceOf('BricksClassLoaderTest\TestObject2',$object);
+		$classLoader->getConfig()->setNamespace('BricksClassLoaderTest');
 		
-		$object = $classLoader->get('deeper.class.hierarchy','BricksClassLoaderTest');
+		$object = $classLoader->get('BricksClassLoader.classLoaderClass',array(
+			'BricksConfig' => $classLoader->getConfig()
+		));
+		$this->assertInstanceOf('BricksClassLoaderTest\TestObject',$object);
+		$object = $classLoader->get('deeper.class.hierarchy');
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObject',$object);
 		
-		$object = $classLoader->get('deeper.class.hierarchy','BricksClassLoaderTest2');
+		$classLoader->getConfig()->resetNamespace();
+		$classLoader->getConfig()->setNamespace('BricksClassLoaderTest2');
+		
+		$object = $classLoader->get('BricksClassLoader.classLoaderClass',array(
+			'BricksConfig' => $classLoader->getConfig()
+		));
 		$this->assertInstanceOf('BricksClassLoaderTest\TestObject2',$object);
+		$object = $classLoader->get('Bricks\ClassLoader\ClassLoader',array(
+			'BricksConfig' => $classLoader->getConfig()
+		));
+		$this->assertInstanceOf('BricksClassLoaderTest\TestObject2',$object);
+		$object = $classLoader->get('deeper.class.hierarchy');
+		$this->assertInstanceOf('BricksClassLoaderTest\TestObject2',$object);
+		
+		$classLoader->getConfig()->resetNamespace();
 				
 	}
 	

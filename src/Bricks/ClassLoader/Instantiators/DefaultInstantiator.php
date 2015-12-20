@@ -28,9 +28,10 @@
 namespace Bricks\ClassLoader\Instantiators;
 
 use Bricks\ClassLoader\ClassLoaderAwareInterface;
+use Bricks\ClassLoader\ClassLoaderInterface;
 
 class DefaultInstantiator 
-implements InstantiatorInterface,ClassLoaderAwareInterface {
+implements InstantiatorInterface, ClassLoaderAwareInterface {
 	
 	/**
 	 * @var ClassLoaderInterface
@@ -40,7 +41,7 @@ implements InstantiatorInterface,ClassLoaderAwareInterface {
 	/**
 	 * @param ClassLoader $classLoader
 	 */
-	public function __construct(ClassLoader $classLoader){
+	public function __construct(ClassLoaderInterface $classLoader){
 		$this->setClassLoader($classLoader);
 	}
 	
@@ -48,7 +49,7 @@ implements InstantiatorInterface,ClassLoaderAwareInterface {
 	 * (non-PHPdoc)
 	 * @see \Bricks\ClassLoader\ClassLoaderAwareInterface::setClassLoader()
 	 */
-	public function setClassLoader(ClassLoader $classLoader){
+	public function setClassLoader(ClassLoaderInterface $classLoader){
 		$this->classLoader = $classLoader;
 	}
 	

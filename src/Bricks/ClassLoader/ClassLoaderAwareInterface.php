@@ -32,7 +32,7 @@ interface ClassLoaderAwareInterface {
 	/**
 	 * @param ClassLoader $classLoader
 	 */
-	public function setClassLoader(ClassLoader $classLoader);
+	public function setClassLoader(ClassLoaderInterface $classLoader);
 	
 	/**
 	 * @return ClassLoader
