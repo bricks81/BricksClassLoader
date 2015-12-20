@@ -37,9 +37,8 @@ class ClassLoaderAwareFactory extends DefaultFactory {
 	 * @param array $factoryParams
 	 */
 	public function build($object,array $factoryParams=array()){
-		$classLoader = $this->getClassLoader();
 		if($object instanceof ClassLoaderAwareInterface){
-			$object->setClassLoader($classLoader);
+			$object->setClassLoader($this->getClassLoader());
 		}
 	}
 	

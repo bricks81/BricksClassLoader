@@ -3,6 +3,7 @@
 return array(
     'Bricks\ClassLoader\ClassLoader'                         => __DIR__ . '/src/Bricks/ClassLoader/ClassLoader.php',
     'Bricks\ClassLoader\ClassLoaderAwareInterface'           => __DIR__ . '/src/Bricks/ClassLoader/ClassLoaderAwareInterface.php',
+    'Bricks\ClassLoader\ClassLoaderInterface'                => __DIR__ . '/src/Bricks/ClassLoader/ClassLoaderInterface.php',
     'Bricks\ClassLoader\Factories\ClassLoaderAwareFactory'   => __DIR__ . '/src/Bricks/ClassLoader/Factories/ClassLoaderAwareFactory.php',
     'Bricks\ClassLoader\Factories\DefaultFactory'            => __DIR__ . '/src/Bricks/ClassLoader/Factories/DefaultFactory.php',
     'Bricks\ClassLoader\Factories\FactoryInterface'          => __DIR__ . '/src/Bricks/ClassLoader/Factories/FactoryInterface.php',

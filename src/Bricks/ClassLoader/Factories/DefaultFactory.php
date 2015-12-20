@@ -83,12 +83,6 @@ class DefaultFactory implements FactoryInterface {
 	 * @see \Bricks\ClassLoader\FactoryInterface::build()
 	 */
 	public function build($object,array $factoryParams=array()){
-		foreach($factoryParams AS $name => $var){
-			$method = 'set'.ucfirst($name);
-			if(method_exists($object,$method)){
-				$object->$method($var);
-			}
-		}
 		return $object;
 	}	
 	

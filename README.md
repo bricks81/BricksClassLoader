@@ -53,12 +53,15 @@ Add the configuration for your module:
 					),
 				),	
 				'classMap' => array(
+					'Path\To\Class' => 'Path\To\Another\Class',
+				),
+				'factories' => array(
 					'Path\To\Class' => array(
-						'instantiator' => 'Instantiator\Class',
-						'factories' => array(
-							'List\Of\Factories'
-						),
-					),
+						'List\Of\Factories'				
+					),	
+				),
+				'instantiator' => array(
+					'Path\To\Class' => 'Instantiator\Class',
 				),
 			),			
 		),

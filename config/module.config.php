@@ -10,12 +10,23 @@ return array(
 		'__DEFAULT_NAMESPACE__' => array(
 			'BricksClassLoader' => array(
 				'classLoaderClass' => 'Bricks\ClassLoader\ClassLoader',
-				'defaultInstantiator' => 'Bricks\ClassLoader\DefaultInstantiator',
+				'defaultInstantiator' => 'Bricks\ClassLoader\Instantiators\DefaultInstantiator',
 				'defaultFactories' => array(					
 					'Bricks\ClassLoader\Factories\DefaultFactory',
-					'Bricks\ClassLoader\Factories\ClassLoaderAwareFactory',
-					'Bricks\ClassLoader\Factories\InitializerFactory',
-				),				
+					'Bricks\ClassLoader\Factories\ClassLoaderAwareFactory',					
+				),
+				/*
+				'factories' => array(
+					'Bricks\ClassLoader\ClassLoader' => array(
+						'Bricks\ClassLoader\Factories\InitializerFactory'
+					),
+				),
+				*/		
+				/*
+				'instantiator' => array(
+					'Bricks\ClassLoader\ClassLoader' => 'Bricks\ClassLoader\Instantiators\DefaultInstantiator',
+				),
+				*/				
 			),
 		),			
 	),
