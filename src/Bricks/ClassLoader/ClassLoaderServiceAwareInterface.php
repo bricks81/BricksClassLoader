@@ -27,16 +27,16 @@
 
 namespace Bricks\ClassLoader;
 
-interface ClassLoaderAwareInterface {
+interface ClassLoaderServiceAwareInterface {
 	
 	/**
-	 * @param ClassLoader $classLoader
+	 * @param ClassLoaderServiceInterface $classLoader
 	 */
-	public function setClassLoader(ClassLoaderInterface $classLoader);
+	public function setClassLoaderService(ClassLoaderServiceInterface $classLoader);
 	
 	/**
-	 * @return ClassLoader
+	 * @return ClassLoaderServiceInterface
 	 */
-	public function getClassLoader();
+	public function getClassLoaderService();
 	
 }

@@ -9,7 +9,8 @@ return array(
 	'BricksConfig' => array(
 		'__DEFAULT_NAMESPACE__' => array(
 			'BricksClassLoader' => array(
-				'classLoaderClass' => 'Bricks\ClassLoader\ClassLoader',
+				'classLoaderService' => 'Bricks\ClassLoader\ClassLoaderService',
+				'defaultClassLoader' => 'Bricks\ClassLoader\ClassLoader\DefaultClassLoader',
 				'defaultInstantiator' => 'Bricks\ClassLoader\Instantiators\DefaultInstantiator',
 				'defaultFactories' => array(					
 					'Bricks\ClassLoader\Factories\DefaultFactory',

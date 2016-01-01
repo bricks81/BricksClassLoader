@@ -27,41 +27,59 @@
 
 namespace Bricks\ClassLoader;
 
-interface ClassLoaderInterface {
+use Bricks\ClassLoader\ClassLoader\ClassLoaderInterface;
+interface ClassLoaderServiceInterface {
 	
 	/**
-	 * @return array
+	 * @param string $moduleName
+	 * @return ClassLoaderInterface
 	 */
-	public function getAliasMap();
+	public function getClassLoader($moduleName);
 	
 	/**
+	 * @param ClassLoaderInterface $classLoader
+	 */
+	public function setClassLoader(ClassLoaderInterface $classLoader);
+	
+	/**
+	 * @param string $namespace
 	 * @return array
 	 */
-	public function getClassMap();
+	public function getAliasMap($namespace=null);
+	
+	/**
+	 * @param string $namespace
+	 * @return array
+	 */
+	public function getClassMap($namespace=null);
 	
 	/**
 	 * @param string $alias
+	 * @param string $namespace
 	 * @return string|null
 	 */
-	public function aliasToClass($alias);
+	public function aliasToClass($alias,$namespace=null);
 	
 	/**
-	 * @param string $class	 
+	 * @param string $class
+	 * @param string $namespace	 
 	 * @return string
 	 */
-	public function getClassOverwrite($class);
+	public function getClassOverwrite($class,$namespace=null);
 	
 	/**
 	 * @param string $classOrAlias
+	 * @param string $namespace
 	 * @return InstantiatorInterface
 	 */
-	public function getInstantiator($classOrAlias);
+	public function getInstantiator($classOrAlias,$namespace=null);
 	
 	/**
 	 * @param string $classOrAlias
+	 * @param string $namespace
 	 * @return array
 	 */
-	public function getFactories($classOrAlias);
+	public function getFactories($classOrAlias,$namespace=null);
 	
 	/**
 	 * @param array $factories	 
@@ -71,23 +89,26 @@ interface ClassLoaderInterface {
 	/**
 	 * @param string $classOrAlias	 
 	 * @param array $params
+	 * @param string $namespace
 	 * @return object	 
 	 */
-	public function instantiate($classOrAlias,array $params=array());
+	public function instantiate($classOrAlias,array $params=array(),$namespace=null);
 
 	/**
 	 * @param object $object
 	 * @param string $classOrAlias	 
+	 * @param string $namespace
 	 * @param array $params
 	 */
-	public function factory($object,$classOrAlias,array $params=array());
+	public function factory($object,$classOrAlias,array $params=array(),$namespace=null);
 	
 	/**	
 	 * @param string $classOrAlias	 
 	 * @param array $params
+	 * @param $namespace
 	 * @return object
 	 */
-	public function singleton($classOrAlias,array $params=array());
+	public function singleton($classOrAlias,array $params=array(),$namespace=null);
 	
 	/**
 	 * 
@@ -99,8 +120,9 @@ interface ClassLoaderInterface {
 	/**
 	 * @param string $classOrAlias
 	 * @param array $params
+	 * @param string $namespace
 	 * @return object
 	 */
-	public function get($classOrAlias,array $params=array());
+	public function get($classOrAlias,array $params=array(),$namespace);
 	
 }

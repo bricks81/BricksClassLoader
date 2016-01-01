@@ -25,20 +25,18 @@
  * THE SOFTWARE.
  */
 
-namespace Bricks\ClassLoader\Factories;
+namespace Bricks\ClassLoader\ClassLoader;
 
-use Bricks\ClassLoader\ClassLoader\ClassLoaderAwareInterface;
-
-class ClassLoaderAwareFactory implements FactoryInterface {
+interface ClassLoaderAwareInterface {
 	
 	/**
-	 * @param object $object
-	 * @param array $factoryParams
+	 * @param ClassLoaderInterface $classLoader
 	 */
-	public function build($object,array $factoryParams=array()){
-		if($object instanceof ClassLoaderAwareInterface){
-			$object->setClassLoader($this->getClassLoader());
-		}
-	}
+	public function setClassLoader(ClassLoaderInterface $classLoader);
+	
+	/**
+	 * @return ClassLoaderInterface
+	 */
+	public function getClassLoader();
 	
 }

@@ -15,7 +15,7 @@
  *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,30 +25,21 @@
  * THE SOFTWARE.
  */
 
-namespace Bricks\ClassLoader\ServiceManager;
+namespace Bricks\ClassLoader\Factories;
 
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\EventManager\EventManagerAwareInterface;
-use Bricks\Config\Config\ConfigAwareInterface;
+use Bricks\ClassLoader\Factories\DefaultFactory;
+use Bricks\ClassLoader\ClassLoaderServiceAwareInterface;
 
-class ClassLoaderFactory implements FactoryInterface {
+class ClassLoaderServiceAwareFactory extends DefaultFactory {
 	
 	/**
-	 * (non-PHPdoc)
-	 * @see \Zend\ServiceManager\FactoryInterface::createService()
+	 * @param object $object
+	 * @param array $factoryParams
 	 */
-	public function createService(ServiceLocatorInterface $sl){
-		$config = $sl->get('BricksConfig');		
-		$class = $config->get('BricksClassLoader.classLoaderService');		
-		$service = new $class;		
-		if($service instanceof EventManagerAwareInterface){
-			$service->setEventManager($sl->get('EventManager'));
+	public function build($object,array $factoryParams=array()){
+		if($object instanceof ClassLoaderServiceAwareInterface){
+			$object->setClassLoaderService($this->getClassLoaderService());
 		}
-		if($class instanceof ConfigAwareInterface){
-			$service->setConfig($sl->get('BricksConfig')->getConfig('BricksClassLoader'));
-		}		
-		return $service;
 	}
 	
 }
