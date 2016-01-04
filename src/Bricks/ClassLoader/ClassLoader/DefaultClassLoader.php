@@ -27,12 +27,15 @@
 
 namespace Bricks\ClassLoader\ClassLoader;
 
-interface ClassLoaderInterface {
+use Bricks\ClassLoader\ClassLoaderServiceAwareInterface;
+use Bricks\ClassLoader\ClassLoaderServiceInterface;
+
+class DefaultClassLoader implements ClassLoaderInterface, ClassLoaderServiceAwareInterface {
 	
 	/**
-	 * @var string
+	 * @var ClassLoaderServiceInterface
 	 */
-	protected $module;
+	protected $classLoaderService;
 	
 	/**
 	 * @var string
@@ -40,24 +43,24 @@ interface ClassLoaderInterface {
 	protected $namespace;
 	
 	/**
-	 * @param string $moduleName
-	 */
-	public function setModule($moduleName){
-		$this->module = $moduleName;
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getModule(){
-		return $this->module;
-	}
-	
-	/**
 	 * @param string $namespace
 	 */
-	public function setNamespace($namespace){
+	public function __construct($namespace){
 		$this->namespace = $namespace;
+	}
+	
+	/**
+	 * @param ClassLoaderServiceInterface $classLoaderService
+	 */
+	public function setClassLoaderService(ClassLoaderServiceInterface $classLoaderService){
+		$this->classLoaderService = $classLoaderService;
+	}
+	
+	/**
+	 * @return ClassLoaderServiceInterface
+	 */
+	public function getClassLoaderService(){
+		return $this->classLoaderService;
 	}
 	
 	/**
@@ -68,61 +71,73 @@ interface ClassLoaderInterface {
 	}
 	
 	/**
-	 * @param string $namespace
-	 * @return array
+	 * {@inheritDoc}
+	 * @see \Bricks\ClassLoader\ClassLoader\ClassLoaderInterface::setInstance()
 	 */
-	public function getAliasMap($namespace=null){
-		$namespace = $namespace?:$this->getNamespace();
-		return $this->getClassLoaderService()->getAliasMap($namespace);
+	public function setInstance($classOrAlias,$object){
+		$this->getClassLoaderService()->setInstance($classOrAlias,$object,$this->getNamespace());
 	}
 	
 	/**
-	 * @param string $namespace
+	 * {@inheritDoc}
+	 * @see \Bricks\ClassLoader\ClassLoader\ClassLoaderInterface::getInstance()
+	 */
+	public function getInstance($classOrAlias){		
+		return $this->getClassLoaderService()->getInstance($classOrAlias,$this->getNamespace());
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \Bricks\ClassLoader\ClassLoader\ClassLoaderInterface::unsetInstance()
+	 */
+	public function unsetInstance($classOrAlias){
+		return $this->getClassLoaderService()->unsetInstance($classOrAlias,$this->getNamespace());
+	}
+	
+	/**
 	 * @return array
 	 */
-	public function getClassMap($namespace=null){
-		$namespace = $namespace?:$this->getNamespace();
-		return $this->getClassLoaderService()->getClassMap($namespace);
+	public function getAliasMap(){		
+		return $this->getClassLoaderService()->getAliasMap($this->getNamespace());
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function getClassMap(){		
+		return $this->getClassLoaderService()->getClassMap($this->getNamespace());
 	}
 	
 	/**
 	 * @param string $alias
-	 * @param string $namespace
 	 * @return string|null
 	 */
-	public function aliasToClass($alias,$namespace=null){
-		$namespace = $namespace?:$this->getNamespace();
-		return $this->getClassLoaderService()->aliasToClass($alias,$namespace);
+	public function aliasToClass($alias){		
+		return $this->getClassLoaderService()->aliasToClass($alias,$this->getNamespace());
 	}
 	
 	/**
 	 * @param string $class
-	 * @param string $namespace
 	 * @return string
 	 */
-	public function getClassOverwrite($class,$namespace=null){
-		$namespace = $namespace?:$this->getNamespace();
-		return $this->getClassLoaderService()->getClassOverwrite($class,$namespace);
+	public function getClassOverwrite($class){		
+		return $this->getClassLoaderService()->getClassOverwrite($class,$this->getNamespace());
 	}
 	
 	/**
 	 * @param string $classOrAlias
-	 * @param string $namespace
 	 * @return InstantiatorInterface
 	 */
-	public function getInstantiator($classOrAlias,$namespace=null){
-		$namespace = $namespace?:$this->getNamespace();
-		return $this->getClassLoaderService()->getInstantiator($classOrAlias,$namespace);
+	public function getInstantiator($classOrAlias){		
+		return $this->getClassLoaderService()->getInstantiator($classOrAlias,$this->getNamespace());
 	}
 	
 	/**
 	 * @param string $classOrAlias
-	 * @param string $namespace
 	 * @return array
 	 */
-	public function getFactories($classOrAlias,$namespace=null){
-		$namespace = $namespace?:$this->getNamespace();
-		return $this->getClassLoaderService()->getFactories($classOrAlias,$namespace);
+	public function getFactories($classOrAlias){		
+		return $this->getClassLoaderService()->getFactories($classOrAlias,$this->getNamespace());
 	}
 	
 	/**
@@ -135,55 +150,37 @@ interface ClassLoaderInterface {
 	/**
 	 * @param string $classOrAlias
 	 * @param array $params
-	 * @param string $namespace
 	 * @return object
 	 */
-	public function instantiate($classOrAlias,array $params=array(),$namespace=null){
-		$namespace = $namespace?:$this->getNamespace();
-		return $this->getClassLoaderService()->instantiate($classOrAlias,$params,$namespace);
+	public function instantiate($classOrAlias,array $params=array()){		
+		return $this->getClassLoaderService()->instantiate($classOrAlias,$params,$this->getNamespace());
 	}
 	
 	/**
 	 * @param object $object
 	 * @param string $classOrAlias
-	 * @param string $namespace
 	 * @param array $params
 	 */
-	public function factory($object,$classOrAlias,array $params=array(),$namespace=null){
-		$namespace = $namespace?:$this->getNamespace();
-		return $this->getClassLoaderService()->factory($object,$classOrAlias,$params,$namespace);
+	public function factory($object,$classOrAlias,array $params=array()){		
+		return $this->getClassLoaderService()->factory($object,$classOrAlias,$params,$this->getNamespace());
 	}
 	
 	/**
 	 * @param string $classOrAlias
 	 * @param array $params
-	 * @param $namespace
 	 * @return object
 	 */
-	public function singleton($classOrAlias,array $params=array(),$namespace=null){
-		$namespace = $namespace?:$this->getNamespace();
-		return $this->getClassLoaderService()->singleton($classOrAlias,$params,$namespace);
-	}
-	
-	/**
-	 *
-	 * @param string $classOrAlias
-	 * @param string $namespace
-	 */
-	public function removeSingleton($classOrAlias,$namespace=null){
-		$namespace = $namespace?:$this->getNamespace();
-		return $this->getClassLoaderService()->removeSingleton($classOrAlias,$namespace);
+	public function singleton($classOrAlias,array $params=array()){		
+		return $this->getClassLoaderService()->singleton($classOrAlias,$params,$this->getNamespace());
 	}
 	
 	/**
 	 * @param string $classOrAlias
 	 * @param array $params
-	 * @param string $namespace
 	 * @return object
 	 */
-	public function get($classOrAlias,array $params=array(),$namespace){
-		$namespace = $namespace?:$this->getNamespace();
-		return $this->getClassLoaderService()->get($classOrAlias,$params,$namespace);
+	public function get($classOrAlias,array $params=array()){		
+		return $this->getClassLoaderService()->get($classOrAlias,$params,$this->getNamespace());
 	}
 	
 }

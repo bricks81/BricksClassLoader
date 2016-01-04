@@ -76,17 +76,13 @@ This example will demonstrate the api that shouldn't change in future.
 ```php
 	// ...
 	// instantiate the class loader for your module
-	$classLoader = $serviceManager->get('BricksClassLoader');
+	$classLoaderService = $serviceManager->get('BricksClassLoader');
 
 	// get a object
+	$classLoader = $classLoaderService->getClassLoader('YourNamespace');
 	$object = $classLoader->get('Path/To/Your/Class',array( // the factory parameters
 		'AnyKey' => $anyVar,
 	));
-
-	// diffrent Namespace
-	$classLoader->getConfig()->setNamespace('YourNamespace');
-	$object = $classLoader->get('BricksPlugin.pluginClass');
-	$classLoader->resetNamespace();
 
 	// create a singleton
 	$object = $classLoader->singleton('Path/To/Your/Class',array(

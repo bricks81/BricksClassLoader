@@ -22,8 +22,5 @@
     	"zendframework/zend-log": "2.*@stable",
     	"zendframework/zend-i18n": "2.*@stable",
         "zendframework/zftool": "dev-master"     	    	
-    },
-    "autoload": {
-    	"classmap": ["autoload_classmap.php"]
     }    
 }

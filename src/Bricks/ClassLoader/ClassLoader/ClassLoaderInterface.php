@@ -30,64 +30,60 @@ namespace Bricks\ClassLoader\ClassLoader;
 interface ClassLoaderInterface {
 	
 	/**
-	 * @param string $moduleName
-	 */
-	public function setModule($moduleName);
-	
-	/**
-	 * @return string
-	 */
-	public function getModule();
-	
-	/**
-	 * @param string $namespace
-	 */
-	public function setNamespace($namespace);
-	
-	/**
 	 * @return string
 	 */
 	public function getNamespace();
 	
 	/**
-	 * @param string $namespace
-	 * @return array
+	 * @param string $classOrAlias
+	 * @param object $object
 	 */
-	public function getAliasMap($namespace=null);
+	public function setInstance($classOrAlias,$object);
 	
 	/**
-	 * @param string $namespace
+	 * @param string $classOrAlias
+	 * @return object
+	 */
+	public function getInstance($classOrAlias);
+	
+	/**
+	 * @param string $classOrAlias
+	 */
+	public function unsetInstance($classOrAlias);
+	
+	/**
 	 * @return array
 	 */
-	public function getClassMap($namespace=null);
+	public function getAliasMap();
+	
+	/**
+	 * @return array
+	 */
+	public function getClassMap();
 	
 	/**
 	 * @param string $alias
-	 * @param string $namespace
 	 * @return string|null
 	 */
-	public function aliasToClass($alias,$namespace=null);
+	public function aliasToClass($alias);
 	
 	/**
 	 * @param string $class
-	 * @param string $namespace
 	 * @return string
 	 */
-	public function getClassOverwrite($class,$namespace=null);
+	public function getClassOverwrite($class);
 	
 	/**
 	 * @param string $classOrAlias
-	 * @param string $namespace
 	 * @return InstantiatorInterface
 	 */
-	public function getInstantiator($classOrAlias,$namespace=null);
+	public function getInstantiator($classOrAlias);
 	
 	/**
 	 * @param string $classOrAlias
-	 * @param string $namespace
 	 * @return array
 	 */
-	public function getFactories($classOrAlias,$namespace=null);
+	public function getFactories($classOrAlias);
 	
 	/**
 	 * @param array $factories
@@ -97,40 +93,29 @@ interface ClassLoaderInterface {
 	/**
 	 * @param string $classOrAlias
 	 * @param array $params
-	 * @param string $namespace
 	 * @return object
 	 */
-	public function instantiate($classOrAlias,array $params=array(),$namespace=null);
+	public function instantiate($classOrAlias,array $params=array());
 	
 	/**
 	 * @param object $object
 	 * @param string $classOrAlias
-	 * @param string $namespace
 	 * @param array $params
 	 */
-	public function factory($object,$classOrAlias,array $params=array(),$namespace=null);
+	public function factory($object,$classOrAlias,array $params=array());
 	
 	/**
 	 * @param string $classOrAlias
 	 * @param array $params
-	 * @param $namespace
 	 * @return object
 	 */
-	public function singleton($classOrAlias,array $params=array(),$namespace=null);
-	
-	/**
-	 *
-	 * @param string $classOrAlias
-	 * @param string $namespace
-	 */
-	public function removeSingleton($classOrAlias,$namespace=null);
+	public function singleton($classOrAlias,array $params=array());
 	
 	/**
 	 * @param string $classOrAlias
 	 * @param array $params
-	 * @param string $namespace
 	 * @return object
 	 */
-	public function get($classOrAlias,array $params=array(),$namespace);
+	public function get($classOrAlias,array $params=array());
 	
 }

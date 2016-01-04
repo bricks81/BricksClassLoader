@@ -27,17 +27,17 @@
 
 namespace Bricks\ClassLoader;
 
-use Bricks\Config\ConfigInterface;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use Bricks\Config\ConfigAwareInterface;
+use Bricks\Config\ConfigServiceAwareInterface;
 use Bricks\ClassLoader\Instantiators\InstantiatorInterface;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Bricks\ClassLoader\ClassLoader\ClassLoaderInterface;
+use Bricks\Config\ConfigServiceInterface;
 
 class ClassLoaderService implements ServiceLocatorAwareInterface, 
-	ConfigAwareInterface, EventManagerAwareInterface, ClassLoaderServiceInterface {
+	ConfigServiceAwareInterface, EventManagerAwareInterface, ClassLoaderServiceInterface {
 	
 	/**
 	 * @var ServiceLocatorInterface
@@ -55,9 +55,9 @@ class ClassLoaderService implements ServiceLocatorAwareInterface,
 	protected $listeners = array();
 	
 	/**
-	 * @var ConfigInterface
+	 * @var ConfigServiceInterface
 	 */
-	protected $config;
+	protected $configService;
 	
 	/**
 	 * @var array
@@ -95,17 +95,15 @@ class ClassLoaderService implements ServiceLocatorAwareInterface,
 		}
 		$eventManager->setIdentifiers($identifiers);
 		$this->eventManager = $eventManager;
-		
-		$hash = spl_object_hash($eventManager);
-		if(!isset($this->listeners[$hash])){
-			$this->attachAliasListener();
-			$this->attachClassmapListener();
-			$this->attachDefaultInstantiatorListener();
-			$this->attachInstantiatorListener();
-			$this->attachDefaultFactoriesListener();
-			$this->attachFactoriesListener();
-			$this->listeners[$hash] = true;
-		}
+	}
+	
+	public function initialize(){
+		$this->attachAliasListener();
+		$this->attachClassmapListener();
+		$this->attachDefaultInstantiatorListener();
+		$this->attachInstantiatorListener();
+		$this->attachDefaultFactoriesListener();
+		$this->attachFactoriesListener();
 	}
 	
 	/**
@@ -116,32 +114,77 @@ class ClassLoaderService implements ServiceLocatorAwareInterface,
 	}
 	
 	/**
-	 * @param ConfigInterface $config
+	 * @param ConfigServiceInterface $configService
 	 */
-	public function setConfig(ConfigInterface $config){
-		$this->config = $config;
+	public function setConfigService(ConfigServiceInterface $configService){
+		$this->configService = $configService;
 	}
 	
 	/**
-	 * @return ConfigInterface
+	 * @return ConfigServiceInterface
 	 */
-	public function getConfig(){
-		return $this->config;		
+	public function getConfigService(){
+		return $this->configService;
+	}
+	
+	/**
+	 * @param string $classOrAlias
+	 * @param mixed $object
+	 * @param string $namespace
+	 */
+	public function setInstance($classOrAlias,$object,$namespace=null){
+		$namespace = $namespace?:$this->getConfigService()->getDefaultNamespace();
+		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class,$namespace);		
+		$this->instances[$class][$namespace] = $object;
+	}
+	
+	/**
+	 * @param string $classOrAlias
+	 * @param string $namespace
+	 */
+	public function getInstance($classOrAlias,$namespace=null){
+		$namespace = $namespace?:$this->getConfigService()->getDefaultNamespace();
+		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class,$namespace);
+		if(isset($this->instances[$class][$namespace])){
+			return $this->instances[$class][$namespace];
+		}
+		if($defaultNamespace != $namespace){
+			$class = $this->aliasToClass($classOrAlias,$defaultNamespace)?:$classOrAlias;
+			$class = $this->getClassOverwrite($class,$defaultNamespace);
+			if(isset($this->instances[$class][$defaultNamespace])){
+				return $this->instances[$class][$defaultNamespace];
+			}
+		}
+	}
+	
+	/**
+	 * @param string $classOrAlias
+	 * @param string $namespace
+	 */
+	public function unsetInstance($classOrAlias,$namespace=null){
+		$namespace = $namespace?:$this->getConfigService()->getDefaultNamespace();
+		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
+		$class = $this->getClassOverwrite($class,$namespace);
+		if(isset($this->instances[$class][$namespace])){
+			unset($this->instances[$class][$namespace]);
+			if(!count($this->instances[$class])){
+				unset($this->instances[$class]);
+			}
+		}
 	}
 	
 	protected function attachAliasListener(){
 		$this->getEventManager()->getSharedManager()->attach('BricksConfig','afterSet',function($e) {
-			if(0 === strpos('BricksClassLoader.aliasMap',$e->getParam('path'))){
-				$path = $e->getParam('path');
-				$parts = explode('.',$path);
-				if(isset($parts[2])){
-					$alias = $parts[2];
-					$class = $this->aliasToClass($alias)?:$alias;
-					$class = $this->getClassOverwrite($class);
-					if(isset($this->instances[$class])){
-						unset($this->instances[$class]);
-					}
-				}			
+			if(0 !== strpos('BricksClassLoader.aliasMap',$e->getParam('path'))){
+				return;
+			}
+			$path = $e->getParam('path');				
+			$parts = explode('.',$path);
+			if(isset($parts[2])){
+				$alias = $parts[2];
+				$this->unsetInstance($alias,$e->getParam('namespace'));
 			}
 		});
 	}
@@ -149,15 +192,13 @@ class ClassLoaderService implements ServiceLocatorAwareInterface,
 	protected function attachClassmapListener(){
 		$this->getEventManager()->getSharedManager()->attach('BricksConfig','afterSet',function($e) {
 			if(0 === strpos('BricksClassLoader.classMap',$e->getParam('path'))){
-				$path = $e->getParam('path');
-				$parts = explode('.',$path);
-				if(isset($parts[2])){
-					$class = $parts[2];
-					$class = $this->getClassOverwrite($class);
-					if(isset($this->instances[$class])){
-						unset($this->instances[$class]);
-					}
-				}
+				return;
+			}
+			$path = $e->getParam('path');
+			$parts = explode('.',$path);
+			if(isset($parts[2])){
+				$class = $parts[2];
+				$this->unsetInstance($class,$e->getParam('namespace'));
 			}
 		});
 	}
@@ -165,15 +206,13 @@ class ClassLoaderService implements ServiceLocatorAwareInterface,
 	protected function attachDefaultInstantiatorListener(){
 		$this->getEventManager()->getSharedManager()->attach('BricksConfig','afterSet',function($e) {
 			if(0 === strpos('BricksClassLoader.defaultInstantiator',$e->getParam('path'))){
-				$path = $e->getParam('path');
-				$parts = explode('.',$path);
-				if(isset($parts[2])){
-					$class = $parts[2];
-					$class = $this->getClassOverwrite($class);
-					if(isset($this->instances[$class])){
-						unset($this->instances[$class]);
-					}
-				}
+				return;
+			}
+			$path = $e->getParam('path');
+			$parts = explode('.',$path);
+			if(isset($parts[2])){
+				$class = $parts[2];
+				$this->unsetInstance($class,$e->getParam('namespace'));
 			}
 		});
 	}
@@ -181,15 +220,13 @@ class ClassLoaderService implements ServiceLocatorAwareInterface,
 	protected function attachInstantiatorListener(){
 		$this->getEventManager()->getSharedManager()->attach('BricksConfig','beforeSet',function($e) {
 			if(0 === strpos('BricksClassLoader.instantiator',$e->getParam('path'))){
-				$path = $e->getParam('path');
-				$parts = explode('.',$path);
-				if(isset($parts[2])){
-					$class = $parts[2];				
-					$class = $this->getClassOverwrite($class);
-					if(isset($this->instances[$class])){
-						unset($this->instances[$class]);
-					}
-				}
+				return;
+			}
+			$path = $e->getParam('path');
+			$parts = explode('.',$path);
+			if(isset($parts[2])){
+				$class = $parts[2];				
+				$this->unsetInstance($class,$e->getParam('namespace'));
 			}
 		});
 	}
@@ -197,26 +234,25 @@ class ClassLoaderService implements ServiceLocatorAwareInterface,
 	protected function attachDefaultFactoriesListener(){
 		$this->getEventManager()->getSharedManager()->attach('BricksConfig','beforeSet',function() {
 			if(0 === strpos('BricksClassLoader.defaultFactories',$e->getParam('path'))){
-				$factories = $this->getConfig()->get('BricksClassLoader.defaultFactories');
-				foreach($factories AS $factory){
-					unset($this->instances[$factory]);
-				}
+				return;
 			}
-		});		
+			$factories = $this->getConfig()->get('BricksClassLoader.defaultFactories',$e->getParam('namespace'));
+			foreach($factories AS $factory){
+				$this->unsetInstance($factory,$e->getParam('namespace'));
+			}			
+		});
 	}
 	
 	protected function attachFactoriesListener(){
 		$this->getEventManager()->getSharedManager()->attach('BricksConfig','beforeSet',function($e) {
 			if(0 === strpos('BricksClassLoader.factories',$e->getParam('path'))){
-				$path = $e->getParam('path');
-				$parts = explode('.',$path);
-				if(isset($parts[2])){
-					$class = $parts[2];
-					$class = $this->getClassOverwrite($class);
-					if(isset($this->instances[$class])){
-						unset($this->instances[$class]);
-					}
-				}
+				return;
+			}
+			$path = $e->getParam('path');
+			$parts = explode('.',$path);
+			if(isset($parts[2])){
+				$class = $parts[2];
+				$this->unsetInstance($class,$e->getParam('namespace'));
 			}
 		});
 	}
@@ -225,12 +261,9 @@ class ClassLoaderService implements ServiceLocatorAwareInterface,
 	 * {@inheritDoc}
 	 * @see \Bricks\ClassLoader\ClassLoaderServiceInterface::getClassLoader()
 	 */
-	public function getClassLoader($moduleName){
-		$object = $this->get('BricksClassLoader.defaultClassLoader');
-		if($object instanceof ClassLoaderInterface){
-			$object->setNamespace($this->getConfig()->getNamespace());
-			$object->setModule($moduleName);
-		}
+	public function getClassLoader($namespace=null){
+		$namespace = $namespace?:$this->getConfigService()->getDefaultNamespace();
+		$object = $this->singleton('BricksClassLoader.defaultClassLoader',array('namespace'=>$namespace),$namespace);		
 		$this->setClassLoader($object);
 		return $object;
 	}
@@ -240,8 +273,7 @@ class ClassLoaderService implements ServiceLocatorAwareInterface,
 	 * @see \Bricks\ClassLoader\ClassLoaderServiceInterface::setClassLoader()
 	 */
 	public function setClassLoader(ClassLoaderInterface $classLoader){
-		$module = $classLoader->getModule();
-		$this->classLoaders[$module] = $classLoader;
+		$this->classLoaders[$classLoader->getNamespace()] = $classLoader;
 	}
 	
 	/**
@@ -249,7 +281,6 @@ class ClassLoaderService implements ServiceLocatorAwareInterface,
 	 * @return array
 	 */
 	public function getAliasMap($namespace=null){
-		$namespace = $namespace?:$this->getConfig()->getNamespace();
 		return $this->getConfig()->get('BricksClassLoader.aliasMap',$namespace);		
 	}
 	
@@ -257,8 +288,7 @@ class ClassLoaderService implements ServiceLocatorAwareInterface,
 	 * @param string $namespace
 	 * @return array
 	 */
-	public function getClassMap($namespace=null){		
-		$namespace = $namespace?:$this->getConfig()->getNamespace();
+	public function getClassMap($namespace=null){
 		return $this->getConfig()->get('BricksClassLoader.classMap',$namespace);		
 	}
 	
@@ -317,21 +347,22 @@ class ClassLoaderService implements ServiceLocatorAwareInterface,
 	 * @return InstantiatorInterface
 	 */
 	public function getInstantiator($classOrAlias,$namespace=null){
-		$namespace = $namespace?:$this->getConfig()->getNamespace();
-		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
-		$class = $this->getClassOverwrite($class,$namespace);
 		$instantiator = $this->getConfig()->get('BricksClassLoader.instantiator.'.$class,$namespace);
 		if($instantiator){
-			if(!isset($this->instances[$class][$namespace])){
-				$this->instances[$class][$namespace] = new $instantiator($this);
+			$instance = $this->getInstance($classOrAlias,$namespace);
+			if(!$instance){
+				$instance = new $instantiator($this);
+				$this->setInstance($classOrAlias,$instance,$namespace);
 			}
 		} else {
 			$defaultInstantiator = $this->getConfig()->get('BricksClassLoader.defaultInstantiator',$namespace);
-			if(!isset($this->instances[$class][$namespace])){
-				$this->instances[$class][$namespace] = new $defaultInstantiator($this);
+			$instance = $this->getInstance($classOrAlias,$namespace);
+			if(!$instance){
+				$instance = new $defaultInstantiator($this);
+				$this->setInstance($classOrAlias,$instance,$namespace);
 			}
 		}
-		return $this->instances[$class][$namespace];
+		return $instance;
 	}
 	
 	/**
@@ -340,24 +371,26 @@ class ClassLoaderService implements ServiceLocatorAwareInterface,
 	 * @return array
 	 */
 	public function getFactories($classOrAlias,$namespace=null){
-		$namespace = $namespace?:$this->getConfig()->getNamespace();
-		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
-		$class = $this->getClassOverwrite($class,$namespace);
-		$defaultFactories = $this->getConfig()->get('BricksClassLoader.defaultFactories',$namespace);
+		$config = $this->getConfigService()->getConfig($namespace);
+		$defaultFactories = $config->get('BricksClassLoader.defaultFactories');
 		$factories = $this->getConfig()->get('BricksClassLoader.factories.'.$class);
 		$return = array();
-		foreach($defaultFactories AS $factory){			
-			if(!isset($this->instances[$factory][$namespace])){
-				$this->instances[$factory][$namespace] = new $factory($this);
+		foreach($defaultFactories AS $factory){
+			$instance = $this->getInstance($factory,$instanceNamespace);
+			if(!$instance){
+				$instance = new $factory($this);
+				$this->setInstance($factory,$instance,$instanceNamespace);
 			}
-			$return[] = $this->instances[$factory][$namespace];
+			$return[] = $instance;
 		}
 		if($factories){
-			foreach($factories AS $factory){				
-				if(!isset($this->instances[$factory][$namespace])){
-					$this->instances[$factory][$namespace] = new $factory($this);
+			foreach($factories AS $factory){
+				$instance = $this->getInstance($factory,$instanceNamespace);
+				if(!$instance){
+					$instance = new $factory($this);
+					$this->setInstance($factory,$instance,$instanceNamespace);
 				}
-				$return[] = $this->instances[$factory][$namespace];
+				$return[] = $instance;
 			}
 		}
 		return $return;
@@ -407,27 +440,13 @@ class ClassLoaderService implements ServiceLocatorAwareInterface,
 	 * @return object
 	 */
 	public function singleton($classOrAlias,array $params=array(),$namespace=null){
-		$namespace = $namespace?:$this->getConfig()->getNamespace();
-		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
-		$class = $this->getClassOverwrite($class,$namespace);
-		if(!isset($this->instances[$class][$namespace])){
-			$this->instances[$class][$namespace] = $this->get($class,$params,$namespace);
-		}		
-		return $this->instances[$class][$namespace];
-	}
-	
-	/**
-	 * 
-	 * @param string $classOrAlias
-	 * @param string $namespace	 
-	 */
-	public function removeSingleton($classOrAlias,$namespace=null){
-		$namespace = $namespace?:$this->getConfig()->getNamespace();
-		$class = $this->aliasToClass($classOrAlias,$namespace)?:$classOrAlias;
-		$class = $this->getClassOverwrite($class,$namespace);
-		if(isset($this->instances[$class][$namespace])){
-			unset($this->instances[$class][$namespace]);
+		$namespace = $namespace?:$this->getConfig()->getDefaultNamespace();
+		$instance = $this->getInstance($classOrAlias,$namespace);
+		if(!$instance){
+			$instance = $this->get($classOrAlias,$params,$namespace);
+			$this->setInstance($classOrAlias,$instance,$instanceNamespace);
 		}
+		return $instance;		
 	}
 	
 	/**

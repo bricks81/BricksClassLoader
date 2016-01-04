@@ -31,13 +31,13 @@ use Bricks\ClassLoader\ClassLoader\ClassLoaderInterface;
 interface ClassLoaderServiceInterface {
 	
 	/**
-	 * @param string $moduleName
+	 * @param string $namespace
 	 * @return ClassLoaderInterface
 	 */
-	public function getClassLoader($moduleName);
+	public function getClassLoader($namespace);
 	
 	/**
-	 * @param ClassLoaderInterface $classLoader
+	 * @param ClassLoaderInterface $classLoader	 
 	 */
 	public function setClassLoader(ClassLoaderInterface $classLoader);
 	
