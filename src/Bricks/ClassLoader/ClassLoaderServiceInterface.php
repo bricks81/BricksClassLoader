@@ -31,6 +31,25 @@ use Bricks\ClassLoader\ClassLoader\ClassLoaderInterface;
 interface ClassLoaderServiceInterface {
 	
 	/**
+	 * @param string $classOrAlias
+	 * @param mixed $object
+	 * @param string $namespace
+	 */
+	public function setInstance($classOrAlias,$object,$namespace=null);
+	
+	/**
+	 * @param string $classOrAlias
+	 * @param string $namespace
+	 */
+	public function getInstance($classOrAlias,$namespace=null);
+	
+	/**
+	 * @param string $classOrAlias
+	 * @param string $namespace
+	 */
+	public function unsetInstance($classOrAlias,$namespace=null);
+	
+	/**
 	 * @param string $namespace
 	 * @return ClassLoaderInterface
 	 */
@@ -109,13 +128,6 @@ interface ClassLoaderServiceInterface {
 	 * @return object
 	 */
 	public function singleton($classOrAlias,array $params=array(),$namespace=null);
-	
-	/**
-	 * 
-	 * @param string $classOrAlias
-	 * @param string $namespace	 
-	 */
-	public function removeSingleton($classOrAlias,$namespace=null);
 	
 	/**
 	 * @param string $classOrAlias

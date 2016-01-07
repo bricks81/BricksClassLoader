@@ -6,19 +6,19 @@ return array(
 				'classLoaderService' => 'Bricks\ClassLoader\ClassLoaderService',
 				'defaultInstantiator' => 'Bricks\ClassLoader\Instantiators\DefaultInstantiator',
 				'defaultFactories' => array(
-					'Bricks\ClassLoader\Factories\DefaultFactory',
+					'Bricks\ClassLoader\Factories\ClassLoaderServiceAwareFactory',
 					'Bricks\ClassLoader\Factories\ClassLoaderAwareFactory',
 				),
 				'classMap' => array(),
 				'aliasMap' => array(
-					'classLoaderClass' => 'Bricks\ClassLoader\ClassLoader\DefaultClassLoader',
+					'defaultClassLoader' => 'Bricks\ClassLoader\ClassLoader\DefaultClassLoader',
 				),
 			),
 		),
 		'BricksClassLoaderTest' => array(
 			'BricksClassLoader' => array(
 				'aliasMap' => array(
-					'classLoaderClass' => 'BricksClassLoaderTest\TestObject',
+					'defaultClassLoader' => 'BricksClassLoaderTest\TestObject',
 					'deeper' => array(
 						'class' => array(
 							'hierarchy' => 'BricksClassLoaderTest\TestObject'

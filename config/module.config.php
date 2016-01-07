@@ -10,11 +10,15 @@ return array(
 		'__DEFAULT_NAMESPACE__' => array(
 			'BricksClassLoader' => array(
 				'classLoaderService' => 'Bricks\ClassLoader\ClassLoaderService',
-				'defaultClassLoader' => 'Bricks\ClassLoader\ClassLoader\DefaultClassLoader',
 				'defaultInstantiator' => 'Bricks\ClassLoader\Instantiators\DefaultInstantiator',
-				'defaultFactories' => array(					
-					'Bricks\ClassLoader\Factories\DefaultFactory',
-					'Bricks\ClassLoader\Factories\ClassLoaderAwareFactory',					
+				'defaultFactories' => array(
+					'Bricks\ClassLoader\Factories\ClassLoaderAwareFactory',
+					'Bricks\ClassLoader\Factories\ClassLoaderServiceAwareFactory',
+				),
+				'aliasMap' => array(
+					'BricksClassLoader' => array(
+						'defaultClassLoader' => 'Bricks\ClassLoader\ClassLoader\DefaultClassLoader',
+					),
 				),
 				/*
 				'factories' => array(

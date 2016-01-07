@@ -29,7 +29,7 @@ namespace Bricks\ClassLoader\Factories;
 
 use Bricks\ClassLoader\ClassLoader\ClassLoaderAwareInterface;
 
-class ClassLoaderAwareFactory implements FactoryInterface {
+class ClassLoaderAwareFactory extends DefaultFactory {
 	
 	/**
 	 * @param object $object

@@ -28,10 +28,10 @@
 namespace Bricks\ClassLoader\Factories;
 
 use Bricks\ClassLoader\ClassLoader;
-use Bricks\ClassLoader\ClassLoaderAwareInterface;
-use Bricks\ClassLoader\ClassLoaderInterface;
+use Bricks\ClassLoader\ClassLoaderServiceAwareInterface;
+use Bricks\ClassLoader\ClassLoaderServiceInterface;
 
-class DefaultFactory implements FactoryInterface, ClassLoaderAwareInterface {
+class DefaultFactory implements FactoryInterface, ClassLoaderServiceAwareInterface {
 	
 	/**
 	 * @var integer
@@ -39,14 +39,9 @@ class DefaultFactory implements FactoryInterface, ClassLoaderAwareInterface {
 	protected $priority = 0;
 	
 	/**
-	 * @var ClassLoader
+	 * @var ClassLoaderServiceInterface
 	 */
-	protected $classLoader;
-	
-	public function __construct(ClassLoaderInterface $classLoader,$priority=0){
-		$this->setClassLoader($classLoader);
-		$this->setPriority($priority);
-	}
+	protected $classLoaderService;
 	
 	/**
 	 * (non-PHPdoc)
@@ -66,18 +61,18 @@ class DefaultFactory implements FactoryInterface, ClassLoaderAwareInterface {
 	
 	/**
 	 * (non-PHPdoc)
-	 * @see \Bricks\ClassLoader\ClassLoaderAwareInterface::setClassLoader()
+	 * @see \Bricks\ClassLoader\ClassLoaderServiceAwareInterface::setClassLoader()
 	 */
-	public function setClassLoader(ClassLoaderInterface $classLoader){
-		$this->classLoader = $classLoader;
+	public function setClassLoaderService(ClassLoaderServiceInterface $classLoaderService){
+		$this->classLoaderService = $classLoaderService;
 	}
 	
 	/**
 	 * (non-PHPdoc)
-	 * @see \Bricks\ClassLoader\ClassLoaderAwareInterface::getClassLoader()
+	 * @see \Bricks\ClassLoader\ClassLoaderServiceAwareInterface::getClassLoader()
 	 */
-	public function getClassLoader(){
-		return $this->classLoader;
+	public function getClassLoaderService(){
+		return $this->classLoaderService;
 	}
 	
 	/**

@@ -27,7 +27,6 @@
 
 namespace Bricks\ClassLoader\Factories;
 
-use Bricks\ClassLoader\Factories\DefaultFactory;
 use Bricks\ClassLoader\ClassLoaderServiceAwareInterface;
 
 class ClassLoaderServiceAwareFactory extends DefaultFactory {
@@ -36,7 +35,7 @@ class ClassLoaderServiceAwareFactory extends DefaultFactory {
 	 * @param object $object
 	 * @param array $factoryParams
 	 */
-	public function build($object,array $factoryParams=array()){
+	public function build($object,array $factoryParams=array()){		
 		if($object instanceof ClassLoaderServiceAwareInterface){
 			$object->setClassLoaderService($this->getClassLoaderService());
 		}
