@@ -14,6 +14,7 @@ return array(
 				'defaultFactories' => array(
 					'Bricks\ClassLoader\Factories\ClassLoaderAwareFactory',
 					'Bricks\ClassLoader\Factories\ClassLoaderServiceAwareFactory',
+					'Bricks\ClassLoader\Factories\InitializerFactory',
 				),
 				'aliasMap' => array(
 					'BricksClassLoader' => array(
