@@ -37,7 +37,7 @@ class InitializerFactory extends DefaultFactory {
 	 */
 	public function build($object,array $factoryParams=array()){
 		if(method_exists($object,'initialize')){
-			$object->initialize($factoryParams);
+			$object->initialize($this,$factoryParams);
 		}		
 	}
 	

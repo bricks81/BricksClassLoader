@@ -29,6 +29,10 @@ namespace Bricks\ClassLoader\Factories;
 
 interface InitializerInterface {
 	
-	public function initialize(array $factoryParams=null);
+	/**
+	 * @param FactoryInterface $factory
+	 * @param array $factoryParams
+	 */
+	public function initialize(FactoryInterface $factory,array $factoryParams=null);
 	
 }
